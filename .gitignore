@@ -33,3 +33,10 @@
 
 .vs
 .out
+/conaninfo.txt
+/conanbuildinfo.cmake
+/conan.lock
+/out
+/conanbuildinfo.txt
+/graph_info.json
+/build/Debug

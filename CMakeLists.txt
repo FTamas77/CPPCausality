@@ -1,30 +1,21 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.12)
 
-project ("engine")
+project(cppcausality LANGUAGES CXX)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_FIND_DEBUG_MODE 1)
 
+# needed for Python
 include(GenerateExportHeader)
 
-add_library(engine SHARED "engine.cpp")
+include(conanbuildinfo.cmake)
+conan_basic_setup()
 
-target_include_directories(engine PRIVATE
-    "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/Include"
-    "D:/Projects/Causality/causalityEnv3.10/lib/site-packages/pybind11/include"
-    "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/Include"
-)
+option(RUN_TESTS "Build the tests" ON)
+if(RUN_TESTS)
+    enable_testing()
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
 
-target_link_libraries(engine PRIVATE
-    "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/libs/python310.lib"
-)
-
-set_target_properties(engine PROPERTIES SUFFIX ".pyd")
-
-GENERATE_EXPORT_HEADER(engine
-    BASE_NAME engine
-    EXPORT_MACRO_NAME engine_EXPORT
-    EXPORT_FILE_NAME engine_Export.h
-    STATIC_DEFINE engine_BUILT_AS_STATIC
-)
-
-install()
+add_subdirectory(src)
