@@ -1,7 +1,7 @@
 import sys, os
-sys.path.append(os.path.join(sys.path[0],'out','build','x64-Debug'))
+parent = os.path.join(sys.path[0],'..')
+sys.path.append(os.path.join(parent,'build','Debug', 'bin'))
 
-from engine import fast_tanh2
+from engine_api import add_numbers
 
-print(fast_tanh2(10))
-print(fast_tanh2(10))
+print(add_numbers(10, 10))

@@ -15,7 +15,7 @@ conan_basic_setup()
 option(RUN_TESTS "Build the tests" ON)
 if(RUN_TESTS)
     enable_testing()
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 endif()
 
 add_subdirectory(src)
