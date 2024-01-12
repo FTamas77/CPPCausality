@@ -1,5 +1,9 @@
+
 #include <pybind11/pybind11.h>
+
+#ifdef _WIN32
 #include <Windows.h>
+#endif
 
 #include "engine_api.h"
 

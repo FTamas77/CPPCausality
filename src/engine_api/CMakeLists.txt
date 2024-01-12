@@ -1,14 +1,24 @@
-﻿add_library(engine_api SHARED engine_api.cpp engine_api.h engine_api_bindings.h)
+﻿add_library(engine_api SHARED
+    engine_api.cpp
+    engine_api.h
+    engine_api_bindings.h)
 
-target_include_directories(engine_api PUBLIC
-    "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/Include"
-    "D:/Projects/Causality/causalityEnv3.10/lib/site-packages/pybind11/include"
-    "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/Include"
-)
+if(MSVC)
+    target_include_directories(engine_api PUBLIC
+        "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/Include"
+        "D:/Projects/Causality/causalityEnv3.10/lib/site-packages/pybind11/include")
 
-target_link_libraries(engine_api PUBLIC
-    "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/libs/python310.lib"
-)
+    target_link_libraries(engine_api PUBLIC
+        "C:/Users/Tamas.Fekete/AppData/Local/Programs/Python/Python310/libs/python310.lib")
+
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    target_include_directories(engine_api PUBLIC
+        "${pybind11_DIR}/include"
+        "/usr/include/python3.9")
+
+    # https://pybind11.readthedocs.io/en/stable/compiling.html#embedding-the-python-interpreter 
+    target_link_libraries(engine_api PUBLIC pybind11::embed ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 set_target_properties(engine_api PROPERTIES SUFFIX ".pyd")
 

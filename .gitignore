@@ -31,7 +31,6 @@
 *.out
 *.app
 
-.vs
 .out
 /conaninfo.txt
 /conanbuildinfo.cmake
@@ -40,3 +39,8 @@
 /conanbuildinfo.txt
 /graph_info.json
 /build/Debug
+/.vs/Linux-GCC-Debug
+/.vs/CPPCausality
+/.vs/cmake.db
+/.vs/CMake Overview
+/.vs/slnx.sqlite

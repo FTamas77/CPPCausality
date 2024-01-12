@@ -1,0 +1,20 @@
+{
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "build\\Debug",
+      "install\\Debug",
+      "out\\build\\Linux-GCC-Debug",
+      "out\\install\\Linux-GCC-Debug"
+    ]
+  },
+  "ExpandedNodes": [
+    "",
+    "\\build",
+    "\\doc",
+    "\\src",
+    "\\src\\engine_api",
+    "\\src\\engine_api\\test"
+  ],
+  "SelectedNode": "\\src\\engine_api\\CMakeLists.txt",
+  "PreviewInSolutionExplorer": false
+}
