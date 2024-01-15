@@ -5,7 +5,7 @@
 * Build on Linux too: **DONE**
 	* Python remote debugging will not be implemented.
 * Add OpenCL
-	* Implemented on only Windows.
+	* Implemented on only Windows using Intel: driver is installed.
 * Implement the API itself
 
 ## Unit test

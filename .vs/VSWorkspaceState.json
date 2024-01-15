@@ -9,12 +9,16 @@
   },
   "ExpandedNodes": [
     "",
-    "\\build",
     "\\doc",
+    "\\OpenCL-Headers",
+    "\\OpenCL-Headers\\tests\\conan",
+    "\\OpenCL-Headers\\tests\\lang_c",
+    "\\OpenCL-Headers\\tests\\lang_cpp",
+    "\\OpenCL-Headers\\tests\\pkgconfig",
     "\\src",
     "\\src\\engine_api",
     "\\src\\engine_api\\test"
   ],
-  "SelectedNode": "\\src\\engine_api\\CMakeLists.txt",
+  "SelectedNode": "\\.gitmodules",
   "PreviewInSolutionExplorer": false
 }

@@ -3,7 +3,18 @@
 https://github.com/KhronosGroup/OpenCL-Headers
 
 # Intel
+**Based on this:**
+
 https://www.intel.com/content/www/us/en/developer/articles/tool/opencl-drivers.html
+
+**installed from here:**
+
+https://www.intel.com/content/www/us/en/developer/articles/technical/intel-cpu-runtime-for-opencl-applications-with-sycl-support.html
+
+**It says it is installed here:**
+
+c:\Program Files (x86)\Common Files\Intel\Shared Libraries\
+
 
 # NVidia
 nvidia quadro t2000
