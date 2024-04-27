@@ -9,7 +9,9 @@ class CausalDiscovery
 {
 private:
     void createFullyConnectedGraph(Graph &graph, const Dataset &data);
+    void applyPCAlgorithm(Graph &graph, const Dataset &data, double alpha);
     void orientVStructures(Graph &graph, const Dataset &data, double alpha);
+    void identifyPossibleDSep(Graph &graph, const Dataset &data);
     void applyFCIRules(Graph &graph, const Dataset &data, double alpha);
     void finalOrientation(Graph &graph, const Dataset &data);
 

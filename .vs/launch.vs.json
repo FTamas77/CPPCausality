@@ -12,6 +12,12 @@
       "MIMode": "gdb",
       "args": [],
       "env": {}
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "causalDiscovery.exe (src\\causalDiscovery.exe)",
+      "name": "causalDiscovery.exe (src\\causalDiscovery.exe)"
     }
   ]
 }

@@ -8,9 +8,7 @@
 
 class Graph
 {
-private:
-    int numVertices;                                      // Number of vertices in the graph
-    std::vector<std::list<std::pair<int, bool>>> adjList; // The adjacency list
+    std::vector<std::list<std::pair<int, bool>>> m_adjList; // The adjacency list
 
 public:
     Graph(int numVertices);
@@ -18,6 +16,10 @@ public:
     void addEdge(int src, int dest, bool isDirected);
 
     const std::list<std::pair<int, bool>> &getAdjVertices(int vertex) const;
+
+    int getNumVertices() const;
+
+    void printGraph() const;
 };
 
 #endif

@@ -38,9 +38,6 @@
 /out
 /conanbuildinfo.txt
 /graph_info.json
-/build/Debug
-/.vs/Linux-GCC-Debug
-/.vs/CPPCausality
-/.vs/cmake.db
-/.vs/CMake Overview
-/.vs/slnx.sqlite
+/build
+/install
+/.vs

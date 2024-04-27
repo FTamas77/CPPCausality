@@ -6,3 +6,6 @@
     graph.cpp
     main.cpp
 )
+
+install(TARGETS causalDiscovery DESTINATION .)
+install(FILES data.csv DESTINATION .)
