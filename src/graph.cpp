@@ -31,11 +31,11 @@ void Graph::printGraph() const
         {
             if (edge.second)
             {
-                std::cout << " | " << i << " --> " << edge.first;
+                std::cout << " | " << " --> " << edge.first;
             }
             else
             {
-                std::cout << " | " << i << " --- " << edge.first;
+                std::cout << " | " << " --- " << edge.first;
             }
         }
         std::cout << "\n";

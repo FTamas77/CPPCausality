@@ -20,7 +20,7 @@ void DataLoader::loadCSV(const std::string &filename, Dataset &dataset)
 
     std::cout << "File opened successfully.\n";
 
-    std::vector<Column> data;
+    std::vector<Column> tmp_data;
     std::string line;
     while (std::getline(file, line))
     {
@@ -33,16 +33,16 @@ void DataLoader::loadCSV(const std::string &filename, Dataset &dataset)
             row.push_back(std::stoi(value));
         }
 
-        data.push_back(row);
+        tmp_data.push_back(row);
     }
 
     // Transpose the data
-    for (size_t i = 0; i < data[0].size(); ++i)
+    for (size_t i = 0; i < tmp_data[0].size(); ++i)
     {
         Column column;
-        for (size_t j = 0; j < data.size(); ++j)
+        for (size_t j = 0; j < tmp_data.size(); ++j)
         {
-            column.push_back(data[j][i]);
+            column.push_back(tmp_data[j][i]);
         }
 
         dataset.addColumn(column);

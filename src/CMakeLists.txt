@@ -1,6 +1,5 @@
 ﻿add_executable(causalDiscovery 
     causalDiscovery.cpp
-    
     dataLoader.cpp
     graph.cpp
     main.cpp
