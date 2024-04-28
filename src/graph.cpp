@@ -17,7 +17,7 @@ const std::list<std::pair<int, bool>> &Graph::getAdjVertices(int vertex) const
     return m_adjList[vertex]; // Get the adjacent vertices of a given vertex
 }
 
-int Graph::getNumVertices() const
+size_t Graph::getNumVertices() const
 {
     return m_adjList.size();
 }
@@ -31,11 +31,26 @@ void Graph::printGraph() const
         {
             if (edge.second)
             {
-                std::cout << " | "  << i << " --> " << edge.first;
-            } else {
+                std::cout << " | " << i << " --> " << edge.first;
+            }
+            else
+            {
                 std::cout << " | " << i << " --- " << edge.first;
             }
         }
         std::cout << "\n";
     }
+}
+
+void Graph::removeEdge(int src, int dest)
+{
+    // Remove the edge from src to dest
+    m_adjList[src].remove_if([dest](const std::pair<int, bool> &edge) {
+        return edge.first == dest;
+    });
+
+    // Remove the edge from dest to src
+    m_adjList[dest].remove_if([src](const std::pair<int, bool> &edge) {
+        return edge.first == src;
+    });
 }

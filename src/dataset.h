@@ -1,25 +1,38 @@
 #ifndef DATASET_H
 #define DATASET_H
 
-#include "dataRow.h"
 #include <vector>
 #include <cstddef>
+#include <memory>
+
+typedef std::vector<int> Column;
 
 class Dataset
 {
-    std::vector<Datarow> data;
+    std::vector<std::shared_ptr<Column>> m_columns;
 
 public:
-    void addRow(const Datarow &row);
+    void addColumn(const Column &column)
+    {
+        m_columns.push_back(std::make_shared<Column>(column));
+    }
 
     size_t getNumOfColumns() const
     {
-        if (data.size() > 0)
-        {
-            return data[0].columns.size();
-        }
+        return m_columns.size();
+    }
 
-		return 0;
+    std::shared_ptr<Column> getColumn(int i) const
+    {
+        if (i >= 0 && i < m_columns.size())
+        {
+            return m_columns[i];
+        }
+        else
+        {
+            return nullptr;
+            // TODO: throw std::out_of_range("Index out of range in Dataset::getColumn");
+        }
     }
 };
 

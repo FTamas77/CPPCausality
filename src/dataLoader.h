@@ -1,7 +1,6 @@
+#include "Dataset.h"
 #include <string>
 #include <vector>
-
-#include "Dataset.h"
 
 class DataLoader
 {

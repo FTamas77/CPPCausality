@@ -4,11 +4,17 @@
 #include "Graph.h"
 #include "Dataset.h"
 #include <memory>
+#include <set>
 
 class CausalDiscovery
 {
 private:
     void createFullyConnectedGraph(Graph &graph, const Dataset &data);
+
+    std::shared_ptr<Column> CausalDiscovery::getColumnData(const Dataset &data, int index) const;
+    bool testConditionalIndependence(const Dataset &data, int i, int j, const std::set<int> &conditioningSet, double alpha);
+
+    void CausalDiscovery::addToConditioningSet(std::set<int> &conditioningSet, int numVertices, int i, int j);
     void applyPCAlgorithm(Graph &graph, const Dataset &data, double alpha);
     void orientVStructures(Graph &graph, const Dataset &data, double alpha);
     void identifyPossibleDSep(Graph &graph, const Dataset &data);

@@ -17,9 +17,11 @@ public:
 
     const std::list<std::pair<int, bool>> &getAdjVertices(int vertex) const;
 
-    int getNumVertices() const;
+    size_t getNumVertices() const;
 
     void printGraph() const;
+
+    void Graph::removeEdge(int src, int dest);
 };
 
 #endif
