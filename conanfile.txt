@@ -1,7 +1,9 @@
 [requires]
-gtest/1.11.0
+#gtest/1.11.0
+boost/1.84.0
 
 [generators]
-cmake
+CMakeDeps
+CMakeToolchain
 
 [options]
