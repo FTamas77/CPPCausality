@@ -40,4 +40,8 @@
 /graph_info.json
 /build
 /install
-/.vs
+.vs/CPPCausality
+.vs/cmake.db
+.vs/CMakeWorkspaceSettings.json
+.vs/slnx.sqlite
+.vs/CMake Overview
