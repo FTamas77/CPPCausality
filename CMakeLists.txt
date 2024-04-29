@@ -15,7 +15,6 @@ if(POLICY CMP0091)
     cmake_policy(SET CMP0091 NEW)
 endif()
 
-
 # Include the Conan toolchain file
 include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
 
@@ -26,9 +25,5 @@ option(RUN_TESTS "Build the tests" ON)
 if(RUN_TESTS)
     enable_testing()
 endif()
-
-# Link against the Boost libraries
-add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
 
 add_subdirectory(src)

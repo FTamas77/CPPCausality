@@ -1,5 +1,6 @@
 #include "graph.h"
-#include "dataloader.h"
+#include "dataset.h"
+#include "dataLoader.h"
 #include "causalDiscovery.h"
 #include <iostream>
 #include <stdexcept>

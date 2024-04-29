@@ -9,12 +9,10 @@
   },
   "ExpandedNodes": [
     "",
-    "\\build",
-    "\\call_c_from_python",
-    "\\call_c_from_python\\engine_api",
+    "\\doc",
     "\\OpenCL-Headers",
     "\\src"
   ],
-  "SelectedNode": "\\CMakeLists.txt",
+  "SelectedNode": "\\src\\main.cpp",
   "PreviewInSolutionExplorer": false
 }

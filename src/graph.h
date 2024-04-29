@@ -21,7 +21,7 @@ public:
 
     void printGraph() const;
 
-    void Graph::removeEdge(int src, int dest);
+    void removeEdge(int src, int dest);
 };
 
 #endif
