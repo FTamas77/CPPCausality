@@ -5,7 +5,7 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/HelloCMake.exe",
+      "program": "${workspaceFolder}/build_vscode/HelloCMake.exe",
       "args": [],
       "stopAtEntry": false,
       "preLaunchTask": "Build Debug",
