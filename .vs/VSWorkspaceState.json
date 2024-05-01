@@ -9,10 +9,9 @@
   },
   "ExpandedNodes": [
     "",
-    "\\doc",
     "\\OpenCL-Headers",
     "\\src"
   ],
-  "SelectedNode": "\\src\\main.cpp",
+  "SelectedNode": "\\conanfile.txt",
   "PreviewInSolutionExplorer": false
 }

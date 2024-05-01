@@ -18,8 +18,7 @@ endif()
 # Include the Conan toolchain file
 include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
 
-# Find the packages specified in your conanfile.txt
-find_package(boost REQUIRED)
+find_package(Boost COMPONENTS math)
 
 option(RUN_TESTS "Build the tests" ON)
 if(RUN_TESTS)
