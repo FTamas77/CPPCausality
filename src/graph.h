@@ -22,6 +22,16 @@ public:
     void printGraph() const;
 
     void removeEdge(int src, int dest);
+
+    std::vector<int> Graph::getNodes() const;
+
+    std::vector<int> getNeighbors(int vertex) const;
+
+    bool hasEdge(int src, int dest) const;
+
+    void orientEdge(int src, int dest);
+
+    std::vector<std::tuple<int, int, bool>> getEdges() const;
 };
 
 #endif

@@ -31,11 +31,13 @@ void Graph::printGraph() const
         {
             if (edge.second)
             {
-                std::cout << " | " << " --> " << edge.first;
+                std::cout << " | "
+                          << " --> " << edge.first;
             }
             else
             {
-                std::cout << " | " << " --- " << edge.first;
+                std::cout << " | "
+                          << " --- " << edge.first;
             }
         }
         std::cout << "\n";
@@ -53,4 +55,61 @@ void Graph::removeEdge(int src, int dest)
     m_adjList[dest].remove_if([src](const std::pair<int, bool> &edge) {
         return edge.first == src;
     });
+}
+
+std::vector<int> Graph::getNodes() const
+{
+    std::vector<int> nodes;
+    for (int i = 0; i < m_adjList.size(); ++i)
+    {
+        nodes.push_back(i);
+    }
+    return nodes;
+}
+
+std::vector<int> Graph::getNeighbors(int vertex) const
+{
+    std::vector<int> neighbors;
+    for (const auto &pair : m_adjList[vertex])
+    {
+        neighbors.push_back(pair.first);
+    }
+    return neighbors;
+}
+
+bool Graph::hasEdge(int src, int dest) const
+{
+    for (const auto &pair : m_adjList[src])
+    {
+        if (pair.first == dest)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Graph::orientEdge(int src, int dest)
+{
+    for (auto &pair : m_adjList[src])
+    {
+        if (pair.first == dest)
+        {
+            pair.second = true; // Make the edge directed
+            break;
+        }
+    }
+}
+
+std::vector<std::tuple<int, int, bool>> Graph::getEdges() const
+{
+    std::vector<std::tuple<int, int, bool>> edges;
+    for (int i = 0; i < m_adjList.size(); ++i)
+    {
+        for (const auto &pair : m_adjList[i])
+        {
+            edges.push_back({i, pair.first, pair.second});
+        }
+    }
+    return edges;
 }
