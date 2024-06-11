@@ -10,8 +10,9 @@
   "ExpandedNodes": [
     "",
     "\\OpenCL-Headers",
-    "\\src"
+    "\\src",
+    "\\tests"
   ],
-  "SelectedNode": "\\conanfile.txt",
+  "SelectedNode": "\\tests\\CMakeLists.txt",
   "PreviewInSolutionExplorer": false
 }

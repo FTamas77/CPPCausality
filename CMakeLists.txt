@@ -2,7 +2,7 @@
 project(cppcausality LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 #set(CMAKE_FIND_DEBUG_MODE 1)
 
 # Run Conan install if necessary
@@ -15,14 +15,18 @@ if(POLICY CMP0091)
     cmake_policy(SET CMP0091 NEW)
 endif()
 
+# Debug
+message("Install directory: ${CMAKE_INSTALL_PREFIX}")
+
 # Include the Conan toolchain file
 include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
 
 find_package(Boost COMPONENTS math)
 
+add_subdirectory(src)
+
 option(RUN_TESTS "Build the tests" ON)
 if(RUN_TESTS)
     enable_testing()
+    add_subdirectory(tests)
 endif()
-
-add_subdirectory(src)
