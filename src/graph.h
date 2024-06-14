@@ -11,6 +11,8 @@ class Graph
     std::vector<std::list<std::pair<int, bool>>> m_adjList; // The adjacency list
 
 public:
+    Graph() : Graph(0) {}
+
     Graph(int numVertices);
 
     void addEdge(int src, int dest, bool isDirected);
@@ -23,7 +25,7 @@ public:
 
     void removeEdge(int src, int dest);
 
-    std::vector<int> Graph::getNodes() const;
+    std::vector<int> getNodes() const;
 
     std::vector<int> getNeighbors(int vertex) const;
 
@@ -33,5 +35,7 @@ public:
 
     std::vector<std::tuple<int, int, bool>> getEdges() const;
 };
+
+bool operator==(const Graph &lhs, const Graph &rhs);
 
 #endif

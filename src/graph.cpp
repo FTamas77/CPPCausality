@@ -113,3 +113,29 @@ std::vector<std::tuple<int, int, bool>> Graph::getEdges() const
     }
     return edges;
 }
+
+bool operator==(const Graph &lhs, const Graph &rhs)
+{
+    // Compare the number of vertices
+    if (lhs.getNumVertices() != rhs.getNumVertices())
+    {
+        return false;
+    }
+
+    // Compare the edges
+    auto lhsEdges = lhs.getEdges();
+    auto rhsEdges = rhs.getEdges();
+    if (lhsEdges.size() != rhsEdges.size())
+    {
+        return false;
+    }
+    for (size_t i = 0; i < lhsEdges.size(); ++i)
+    {
+        if (lhsEdges[i] != rhsEdges[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}

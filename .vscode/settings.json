@@ -59,5 +59,6 @@
     "xtree": "cpp",
     "xutility": "cpp",
     "numeric": "cpp"
-  }
+  },
+  "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }

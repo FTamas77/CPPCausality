@@ -5,8 +5,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 #set(CMAKE_FIND_DEBUG_MODE 1)
 
+# Set the output directories
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
+
 # Run Conan install if necessary
-if (NOT EXISTS "${CMAKE_BINARY_DIR}/conan.lock" OR NOT EXISTS "${CMAKE_BINARY_DIR}/conan_toolchain.cmake")
+if (NOT EXISTS "${CMAKE_BINARY_DIR}/conan.lock" OR NOT EXISTS "${CMAKE_BINARY_DIR}/build/generators/conan_toolchain.cmake")
     execute_process(COMMAND conan install ${CMAKE_SOURCE_DIR} --build=missing --output-folder ${CMAKE_BINARY_DIR})
 endif()
 
@@ -19,7 +26,7 @@ endif()
 message("Install directory: ${CMAKE_INSTALL_PREFIX}")
 
 # Include the Conan toolchain file
-include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
+include(${CMAKE_BINARY_DIR}/build/generators/conan_toolchain.cmake)
 
 find_package(Boost COMPONENTS math)
 

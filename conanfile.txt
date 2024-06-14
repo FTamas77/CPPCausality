@@ -1,5 +1,5 @@
 [requires]
-boost/1.81.0
+boost/1.85.0
 gtest/1.14.0
 
 [generators]
@@ -8,4 +8,10 @@ CMakeToolchain
 
 [options]
 boost/*:without_log=False
-gtest/*:shared=True
+gtest/*:shared=False
+
+[layout]
+cmake_layout
+
+[tool_requires]
+b2/5.2.0

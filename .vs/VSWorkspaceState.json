@@ -9,6 +9,7 @@
   },
   "ExpandedNodes": [
     "",
+    "\\doc",
     "\\OpenCL-Headers",
     "\\src",
     "\\tests"
