@@ -6,149 +6,126 @@
 #include <stack>
 #include <set>
 #include <stdexcept>
+#include <iostream>
 
-void CausalDiscovery::createFullyConnectedGraph(Graph &graph, const Dataset &data)
+void CausalDiscovery::createFullyConnectedGraph(std::shared_ptr<Graph> graph)
 {
-    for (int i = 0; i < graph.getNumVertices(); ++i)
+    if (!graph)
     {
-        for (int j = i + 1; j < graph.getNumVertices(); ++j)
-        {
-            graph.addEdge(i, j, false); // Assuming the graph is undirected
-                                        // Note: we pass j, i in case of undirected graph inside addEdge function
-            //graph.addEdge(j, i, false); // Add the reverse edge as well
-        }
-    }
-}
-
-std::shared_ptr<Column> CausalDiscovery::getColumnData(const Dataset &data, int index) const
-{
-    std::shared_ptr<Column> column = data.getColumn(index);
-    if (!column)
-    {
-        throw std::runtime_error("Invalid column index");
-    }
-    return column;
-}
-
-bool CausalDiscovery::testConditionalIndependence(const Dataset &data, int i, int j, const std::set<int> &conditioningSet, double alpha)
-{
-    std::shared_ptr<Column> data_i = getColumnData(data, i);
-    std::shared_ptr<Column> data_j = getColumnData(data, j);
-
-    std::vector<std::shared_ptr<Column>> data_conditioningSet;
-    for (int k : conditioningSet)
-    {
-        std::shared_ptr<Column> column_k = getColumnData(data, k);
-        if (column_k)
-        {
-            data_conditioningSet.push_back(column_k);
-        }
-        else
-        {
-            throw std::runtime_error("Invalid column data");
-        }
+        throw std::runtime_error("Graph is nullptr");
     }
 
-    // Perform the statistical test
-    double p_value = Statistic::performStatisticalTest(data_i, data_j, data_conditioningSet);
-
-    // Return true if the p-value is greater than the significance level alpha
-    return p_value > alpha;
+    for (int i = 0; i < graph->getNumVertices(); ++i)
+    {
+        for (int j = i + 1; j < graph->getNumVertices(); ++j)
+        {
+            graph->addUndirectedEdge(i, j);
+        }
+    }
 }
 
 void CausalDiscovery::addToConditioningSet(std::set<int> &conditioningSet, int numVertices, int i, int j)
 {
     for (int k = 0; k < numVertices; ++k)
     {
-        // Don't add i or j to the conditioning set
-        if (k == i || k == j)
+        if (k == i || k == j || conditioningSet.find(k) != conditioningSet.end())
         {
             continue;
         }
 
-        // If k is not already in the conditioning set, add it
-        if (conditioningSet.find(k) == conditioningSet.end())
-        {
-            conditioningSet.insert(k);
-            break;
-        }
+        conditioningSet.insert(k);
+        return;
     }
+
+    throw std::runtime_error("No valid vertex to add to the conditioning set");
 }
 
-void CausalDiscovery::applyPCAlgorithm(Graph &graph, const Dataset &data, double alpha)
+void CausalDiscovery::applyPCAlgorithm(std::shared_ptr<Graph> graph, double alpha)
 {
-    int numVertices = graph.getNumVertices();
+    /* ...  iteratively increasing the size of the conditioning set and removing edges when independence is detected...*/
 
-    // For each pair of vertices
+    int numVertices = graph->getNumVertices();
+    std::shared_ptr<const Dataset> data = graph->getDataset();
+
     for (int i = 0; i < numVertices; ++i)
     {
-        for (int j = i + 1; j < numVertices; ++j) // Only process the edge (i, j) if i < j
+        for (int j = i + 1; j < numVertices; ++j)
         {
-            // Start with an empty set of conditioning variables
             std::set<int> conditioningSet;
 
-            // While there are still vertices to condition on
             while (conditioningSet.size() < numVertices - 2)
             {
-                // Test if i and j are conditionally independent given the conditioning set
-                bool independent = testConditionalIndependence(data, i, j, conditioningSet, alpha);
+                double p_value = Statistic::performStatisticalTest(*data, i, j, conditioningSet);
+                bool independent = p_value > alpha;
 
-                // If i and j are conditionally independent, remove the edge between them and break the loop
                 if (independent)
                 {
-                    graph.removeEdge(i, j);
-                    graph.removeEdge(j, i); // Also remove the edge in the opposite direction
+                    graph->removeUndirectedEdge(i, j);
+                    graph->removeUndirectedEdge(j, i);
                     break;
                 }
-                // If i and j are not conditionally independent, add a new vertex to the conditioning set
                 else
                 {
-                    addToConditioningSet(conditioningSet, numVertices, i, j);
+                    try
+                    {
+                        addToConditioningSet(conditioningSet, numVertices, i, j);
+                    }
+                    catch (const std::runtime_error &e)
+                    {
+                        std::cerr << e.what() << std::endl;
+                        break;
+                    }
                 }
             }
         }
     }
 }
 
-void CausalDiscovery::pruneGraph(Graph &graph, const Dataset &data, double alpha)
+void CausalDiscovery::pruneGraph(std::shared_ptr<Graph> graph, double alpha)
 {
-    for (int X = 0; X < graph.getNumVertices(); ++X)
+    std::shared_ptr<const Dataset> data = graph->getDataset();
+
+    for (int X = 0; X < graph->getNumVertices(); ++X)
     {
-        auto neighbors = graph.getNeighbors(X);
+        auto neighbors = graph->getNeighbors(X);
         for (int i = 0; i < neighbors.size(); ++i)
         {
             for (int j = i + 1; j < neighbors.size(); ++j)
             {
                 int Y = neighbors[i];
                 int Z = neighbors[j];
-                bool independent = testConditionalIndependence(data, Y, Z, {X}, alpha);
+                double p_value = Statistic::performStatisticalTest(*data, Y, Z, {X});
+                bool independent = p_value > alpha;
                 if (independent)
                 {
-                    graph.removeEdge(Y, Z);
+                    graph->removeUndirectedEdge(Y, Z);
                 }
             }
         }
     }
 }
 
-void CausalDiscovery::orientVStructures(Graph &graph, const Dataset &data, double alpha)
+void CausalDiscovery::orientVStructures(std::shared_ptr<Graph> graph, double alpha)
 {
-    for (int Z = 0; Z < graph.getNumVertices(); ++Z)
+    std::shared_ptr<const Dataset> data = graph->getDataset();
+
+    for (int Z = 0; Z < graph->getNumVertices(); ++Z)
     {
-        auto neighbors = graph.getNeighbors(Z);
+        auto neighbors = graph->getNeighbors(Z);
         for (int i = 0; i < neighbors.size(); ++i)
         {
             for (int j = i + 1; j < neighbors.size(); ++j)
             {
                 int X = neighbors[i];
                 int Y = neighbors[j];
-                if (!graph.hasEdge(X, Y))
+                if (!graph->hasUndirectedEdge(X, Y))
                 {
-                    bool independent = testConditionalIndependence(data, X, Y, {Z}, alpha);
+                    double p_value = Statistic::performStatisticalTest(*data, X, Y, {Z});
+                    bool independent = p_value > alpha;
                     if (!independent)
                     {
-                        graph.orientEdge(X, Z);
-                        graph.orientEdge(Y, Z);
+                        graph->orientEdge(X, Z);
+                        graph->orientEdge(Y, Z);
                     }
                 }
             }
@@ -159,38 +136,32 @@ void CausalDiscovery::orientVStructures(Graph &graph, const Dataset &data, doubl
 std::vector<std::vector<int>> CausalDiscovery::powerSet(const std::vector<int> &originalSet)
 {
     std::vector<std::vector<int>> resultSet;
-    std::vector<int> emptySet;
-    resultSet.push_back(emptySet);
+    resultSet.push_back({});
 
-    for (int i = 0; i < originalSet.size(); i++)
+    for (int elem : originalSet)
     {
-        std::vector<std::vector<int>> tempSet = resultSet;
-
-        for (auto &set : tempSet)
+        std::vector<std::vector<int>> newSets;
+        for (auto &subset : resultSet)
         {
-            set.push_back(originalSet[i]);
+            std::vector<int> newSubset = subset;
+            newSubset.push_back(elem);
+            newSets.push_back(newSubset);
         }
-
-        for (auto &set : tempSet)
-        {
-            resultSet.push_back(set);
-        }
+        resultSet.insert(resultSet.end(), newSets.begin(), newSets.end());
     }
 
     return resultSet;
 }
 
-bool CausalDiscovery::areDSeparated(int node1, int node2, const std::vector<int> &conditioningSet, const Graph &graph)
+bool CausalDiscovery::areDSeparated(std::shared_ptr<Graph> graph, int node1, int node2, const std::vector<int> &conditioningSet)
 {
-    std::vector<bool> visited(graph.getNumVertices(), false);
+    std::vector<bool> visited(graph->getNumVertices(), false);
 
-    // Mark nodes in the conditioning set as visited
     for (int node : conditioningSet)
     {
         visited[node] = true;
     }
 
-    // Start DFS from node1
     std::stack<int> stack;
     stack.push(node1);
 
@@ -201,14 +172,13 @@ bool CausalDiscovery::areDSeparated(int node1, int node2, const std::vector<int>
 
         if (node == node2)
         {
-            return false; // There's a path from node1 to node2 that doesn't pass through any node in the conditioning set
+            return false;
         }
 
         if (!visited[node])
         {
             visited[node] = true;
-
-            for (int neighbor : graph.getNeighbors(node))
+            for (int neighbor : graph->getNeighbors(node))
             {
                 if (!visited[neighbor])
                 {
@@ -218,40 +188,35 @@ bool CausalDiscovery::areDSeparated(int node1, int node2, const std::vector<int>
         }
     }
 
-    return true; // No such path exists, so node1 and node2 are d-separated
+    return true;
 }
 
-std::set<std::pair<int, int>> CausalDiscovery::identifyPossibleDSep(const Graph &graph)
+std::set<std::pair<int, int>> CausalDiscovery::identifyPossibleDSep(std::shared_ptr<Graph> graph)
 {
     std::set<std::pair<int, int>> dsepSet;
-
-    // Get the number of vertices in the graph
-    int numVertices = graph.getNumVertices();
-
-    // Initialize a vector to hold the nodes, with a size equal to the number of vertices
+    int numVertices = graph->getNumVertices();
     std::vector<int> nodes(numVertices);
-
-    // Assign each node a unique identifier (in this case, the index of the node)
     for (int i = 0; i < numVertices; ++i)
     {
         nodes[i] = i;
     }
 
-    // For each pair of nodes in the graph
     for (int i = 0; i < nodes.size(); ++i)
     {
         for (int j = i + 1; j < nodes.size(); ++j)
         {
-            // Get the set of all other nodes
-            std::vector<int> otherNodes = nodes;
-            otherNodes.erase(otherNodes.begin() + i);
-            otherNodes.erase(otherNodes.begin() + j - 1);
+            std::vector<int> otherNodes;
+            for (int k = 0; k < nodes.size(); ++k)
+            {
+                if (k != i && k != j)
+                {
+                    otherNodes.push_back(nodes[k]);
+                }
+            }
 
-            // For each subset of other nodes
             for (auto &subset : powerSet(otherNodes))
             {
-                // If node1 and node2 are d-separated by the subset, add them to the dsep set
-                if (areDSeparated(nodes[i], nodes[j], subset, graph))
+                if (areDSeparated(graph, nodes[i], nodes[j], subset))
                 {
                     dsepSet.insert({nodes[i], nodes[j]});
                 }
@@ -262,80 +227,77 @@ std::set<std::pair<int, int>> CausalDiscovery::identifyPossibleDSep(const Graph 
     return dsepSet;
 }
 
-void CausalDiscovery::applyFCIRules(Graph &graph, const Dataset &data, double alpha, const std::set<std::pair<int, int>> &possibleDSep)
+void CausalDiscovery::applyFCIRules(std::shared_ptr<Graph> graph, double alpha, const std::set<std::pair<int, int>> &possibleDSep)
 {
-    // For each edge in the graph
-    for (const auto &edge : graph.getEdges())
+    for (const auto& edge : graph->getEdges())
     {
         int node1 = std::get<0>(edge);
         int node2 = std::get<1>(edge);
         bool isOriented = std::get<2>(edge);
 
-        // If the pair of nodes is in the set of possibly d-separated pairs
-        if (possibleDSep.find(std::make_pair(node1, node2)) != possibleDSep.end())
+        if (possibleDSep.find({ node1, node2 }) != possibleDSep.end())
         {
-            // Apply the FCI rules to orient the edge
-            // ...
+            // Apply FCI rules to orient the edge
+            // This is a placeholder. Replace with actual FCI rule application.
+            if (!isOriented)
+            {
+                // Example placeholder for an FCI rule
+                graph->orientEdge(node1, node2);
+            }
         }
     }
 }
 
-void CausalDiscovery::finalOrientation(Graph &graph, const Dataset &data)
+void CausalDiscovery::finalOrientation(std::shared_ptr<Graph> graph)
 {
-    // For each edge in the graph
-    for (const auto &edge : graph.getEdges())
+    // Iterate over each edge in the graph
+    for (const auto &edge : graph->getEdges())
     {
         int src = std::get<0>(edge);
         int dest = std::get<1>(edge);
         bool isOriented = std::get<2>(edge);
 
-        // If the edge is not oriented
+        // Orient the edge if it is not already oriented
         if (!isOriented)
         {
-            // Orient the edge based on some criterion
-            // For example, you might use a statistical test to determine the direction of causality
-            // Here we'll just orient the edge from the lower-indexed vertex to the higher-indexed vertex
+            // Orient the edge from the lower-indexed vertex to the higher-indexed vertex
             if (src < dest)
             {
-                graph.orientEdge(src, dest);
+                graph->orientEdge(src, dest);
             }
             else
             {
-                graph.orientEdge(dest, src);
+                graph->orientEdge(dest, src);
             }
         }
     }
 }
 
-std::unique_ptr<Graph> CausalDiscovery::FCI(const Dataset &data, double alpha)
+void CausalDiscovery::runFCI(std::shared_ptr<Graph> graph, double alpha)
 {
-    std::unique_ptr<Graph> graph = std::make_unique<Graph>(data.getNumOfColumns());
-    graph->printGraph();
 
     // Step 1
-    createFullyConnectedGraph(*graph, data);
+    createFullyConnectedGraph(graph);
     graph->printGraph();
 
     // Step 2
-    applyPCAlgorithm(*graph, data, alpha);
+    applyPCAlgorithm(graph, alpha);
     graph->printGraph();
 
     // Step 3
-    pruneGraph(*graph, data, alpha);
+    pruneGraph(graph, alpha);
     graph->printGraph();
 
     // Step 4
-    orientVStructures(*graph, data, alpha);
+    orientVStructures(graph, alpha);
     graph->printGraph();
 
     // Step 5
-    std::set<std::pair<int, int>> possibleDSep = identifyPossibleDSep(*graph);
-    applyFCIRules(*graph, data, alpha, possibleDSep);
+    std::set<std::pair<int, int>> possibleDSep = identifyPossibleDSep(graph);
+    applyFCIRules(graph, alpha, possibleDSep);
     graph->printGraph();
 
     // Step 6
-    finalOrientation(*graph, data);
+    finalOrientation(graph);
     graph->printGraph();
-
-    return graph;
 }

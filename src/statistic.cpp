@@ -6,6 +6,7 @@
 #include <cmath>
 #include <boost/math/distributions/students_t.hpp>
 
+/*
 double Statistic::performStatisticalTest(const std::shared_ptr<Column> data_i,
                                          const std::shared_ptr<Column> data_j,
                                          const std::vector<std::shared_ptr<Column>> data_conditioningSet)
@@ -34,4 +35,31 @@ double Statistic::performStatisticalTest(const std::shared_ptr<Column> data_i,
     double p = 2 * (1 - boost::math::cdf(dist, std::abs(t)));
 
     return p;
+}
+*/
+
+double Statistic::performStatisticalTest(const Dataset &data, int i, int j, const std::set<int> &conditioningSet)
+{
+    // This function should implement the statistical test using the indices of the columns.
+    // Retrieve column data based on indices and perform the test.
+    std::shared_ptr<Column> data_i = data.getColumn(i);
+    std::shared_ptr<Column> data_j = data.getColumn(j);
+
+    std::vector<std::shared_ptr<Column>> data_conditioningSet;
+    for (int k : conditioningSet)
+    {
+        std::shared_ptr<Column> column_k = data.getColumn(k);
+        if (column_k)
+        {
+            data_conditioningSet.push_back(column_k);
+        }
+        else
+        {
+            throw std::runtime_error("Invalid column data");
+        }
+    }
+
+    // Perform the actual statistical test with data_i, data_j, and data_conditioningSet
+    // This is a placeholder. Replace it with actual test logic.
+    return 0.05; // Placeholder p-value
 }

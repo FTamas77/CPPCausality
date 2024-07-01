@@ -9,70 +9,52 @@
 class CausalDiscoveryTest : public ::testing::Test
 {
 protected:
-    // You can remove any or all of the following functions if its body is empty.
-
     CausalDiscoveryTest()
     {
-        // You can do set-up work for each test here.
     }
 
     ~CausalDiscoveryTest() override
     {
-        // You can do clean-up work that doesn't throw exceptions here.
     }
-
-    // If the constructor and destructor are not enough for setting up
-    // and cleaning up each test, you can define the following methods:
 
     void SetUp() override
     {
-        // Code here will be called immediately after the constructor (right
-        // before each test).
     }
 
     void TearDown() override
     {
-        // Code here will be called immediately after each test (right
-        // before the destructor).
     }
-
-    // Class members declared here can be used by all tests in the test suite for CausalDiscoveryTest.
 };
 
-TEST_F(CausalDiscoveryTest, TestFCI)
+TEST_F(CausalDiscoveryTest, SmokeTestFCIWithLargerDataset)
 {
-    Dataset data;
-    DataLoader loader;
+    auto data = std::make_shared<Dataset>(std::initializer_list<Column>{
+        {1, 2, 3, 4, 5},   // Variable 0
+        { 2, 3, 4, 5, 6 },   // Variable 1 (correlated with Variable 0)
+        { 1, 1, 2, 2, 3 },   // Variable 2 (correlated with Variable 3)
+        { 2, 2, 3, 3, 4 },   // Variable 3 (correlated with Variable 2)
+        { 5, 4, 3, 2, 1 }    // Variable 4 (negatively correlated with Variable 0)
+    });
 
-    // Load the data from the CSV file
-    try
-    {
-        loader.loadCSV("./data.csv", data);
-    }
-    catch (const std::exception& e)
-    {
-        FAIL() << "Failed to load data: " << e.what();
-    }
 
-    // Set your significance level
+    auto graph = std::make_shared<Graph>(data);
+
+    // Significance level
     double alpha = 0.05;
 
-    // Run the FCI algorithm
     CausalDiscovery fci;
-    auto result = fci.FCI(data, alpha);
+    fci.runFCI(graph, alpha);
 
-    result->printGraph();
+    auto expectedGraph = std::make_shared<Graph>(data);
+    expectedGraph->addUndirectedEdge(0, 1);
+    expectedGraph->addUndirectedEdge(2, 3);
+    expectedGraph->addUndirectedEdge(0, 4);
 
-    // Check the output
-    // This will depend on what output you expect from your FCI algorithm
-    // Replace with your actual expected output
-    std::unique_ptr<Graph> expectedOutput = std::make_unique<Graph>();
-    // Set up the expected graph structure here...
+    ASSERT_EQ(graph, expectedGraph) << "FCI algorithm should produce the expected graph structure";
 
-    ASSERT_EQ(*result, *expectedOutput);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

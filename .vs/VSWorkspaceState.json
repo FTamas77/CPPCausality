@@ -14,6 +14,6 @@
     "\\src",
     "\\tests"
   ],
-  "SelectedNode": "\\tests\\CMakeLists.txt",
+  "SelectedNode": "\\src\\causalDiscovery.cpp",
   "PreviewInSolutionExplorer": false
 }

@@ -16,4 +16,3 @@
 
 **Return the Graph:** The resulting graph is returned as a unique_ptr.
 
-Please note that the actual implementation of these steps will depend on the details of your Graph and Dataset classes, as well as the specific statistical tests you're using for conditional independence.
