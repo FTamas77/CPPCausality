@@ -55,7 +55,7 @@ void CausalDiscovery::applyPCAlgorithm(std::shared_ptr<Graph> graph, double alph
 
             while (conditioningSet.size() < numVertices - 2)
             {
-                double p_value = Statistic::performStatisticalTest(*data, i, j, conditioningSet);
+                double p_value = Statistic::testConditionalIndependence(data, i, j, conditioningSet);
                 bool independent = p_value > alpha;
 
                 if (independent)
@@ -94,7 +94,7 @@ void CausalDiscovery::pruneGraph(std::shared_ptr<Graph> graph, double alpha)
             {
                 int Y = neighbors[i];
                 int Z = neighbors[j];
-                double p_value = Statistic::performStatisticalTest(*data, Y, Z, {X});
+                double p_value = Statistic::testConditionalIndependence(data, Y, Z, {X});
                 bool independent = p_value > alpha;
                 if (independent)
                 {
@@ -120,7 +120,7 @@ void CausalDiscovery::orientVStructures(std::shared_ptr<Graph> graph, double alp
                 int Y = neighbors[j];
                 if (!graph->hasUndirectedEdge(X, Y))
                 {
-                    double p_value = Statistic::performStatisticalTest(*data, X, Y, {Z});
+                    double p_value = Statistic::testConditionalIndependence(data, X, Y, {Z});
                     bool independent = p_value > alpha;
                     if (!independent)
                     {

@@ -21,20 +21,20 @@ std::shared_ptr<const Dataset> Graph::getDataset() const {
 
 void Graph::addDirectedEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size()) {
-        m_adjList[src].push_back(dest);
+        m_adjList[src].insert(dest);
     }
 }
 
 void Graph::addUndirectedEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
-        m_adjList[src].push_back(dest);
-        m_adjList[dest].push_back(src);
+        m_adjList[src].insert(dest);
+        m_adjList[dest].insert(src);
     }
 }
 
 bool Graph::hasDirectedEdge(int src, int dest) const {
     if (src >= 0 && src < m_adjList.size()) {
-        return std::find(m_adjList[src].begin(), m_adjList[src].end(), dest) != m_adjList[src].end();
+        return m_adjList[src].find(dest) != m_adjList[src].end();
     }
 
     return false;
@@ -42,8 +42,8 @@ bool Graph::hasDirectedEdge(int src, int dest) const {
 
 bool Graph::hasUndirectedEdge(int src, int dest) const {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
-        bool srcToDest = std::find(m_adjList[src].begin(), m_adjList[src].end(), dest) != m_adjList[src].end();
-        bool destToSrc = std::find(m_adjList[dest].begin(), m_adjList[dest].end(), src) != m_adjList[dest].end();
+        bool srcToDest = m_adjList[src].find(dest) != m_adjList[src].end();
+        bool destToSrc = m_adjList[dest].find(src) != m_adjList[dest].end();
 
         return srcToDest && destToSrc;
     }
@@ -52,14 +52,14 @@ bool Graph::hasUndirectedEdge(int src, int dest) const {
 
 void Graph::removeDirectedEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size()) {
-        m_adjList[src].remove(dest);
+        m_adjList[src].erase(dest);
     }
 }
 
 void Graph::removeUndirectedEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
-        m_adjList[src].remove(dest);
-        m_adjList[dest].remove(src);
+        m_adjList[src].erase(dest);
+        m_adjList[dest].erase(src);
     }
 }
 
@@ -77,7 +77,7 @@ std::vector<int> Graph::getNeighbors(int vertex) const {
 
 void Graph::orientEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
-        m_adjList[dest].remove(src);
+        m_adjList[dest].erase(src);
     }
 }
 
@@ -86,7 +86,14 @@ void Graph::printGraph() const {
         std::cout << "Vertex: " << i << ":\n";
 
         for (const auto& dest : m_adjList[i]) {
-            std::cout << " | --- " << dest;
+            if (m_adjList[dest].find(i) != m_adjList[dest].end()) {
+                // There is an edge from dest to i as well, so it's undirected
+                std::cout << " | --- " << dest << " (undirected)";
+            }
+            else {
+                // There is no edge from dest to i, so it's directed
+                std::cout << " | --> " << dest << " (directed)";
+            }
         }
 
         std::cout << "\n";
@@ -124,13 +131,7 @@ bool operator==(const Graph& lhs, const Graph& rhs) {
     }
 
     for (size_t i = 0; i < lhs.m_adjList.size(); ++i) {
-        auto lhsList = lhs.m_adjList[i];
-        lhsList.sort();
-
-        auto rhsList = rhs.m_adjList[i];
-        rhsList.sort();
-
-        if (lhsList != rhsList) {
+        if (lhs.m_adjList[i] != rhs.m_adjList[i]) {
             return false;
         }
     }

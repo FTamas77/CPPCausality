@@ -3,7 +3,7 @@
 
 #include "dataset.h"
 #include <vector>
-#include <list>
+#include <set>
 #include <memory>
 #include <algorithm>
 #include <iostream>
@@ -12,7 +12,7 @@
 class Graph
 {
 public:
-    using EdgeList = std::list<int>;
+    using EdgeList = std::set<int>;
 
     Graph() = delete;
 

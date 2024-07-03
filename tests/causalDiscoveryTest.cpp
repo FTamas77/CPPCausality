@@ -29,13 +29,19 @@ protected:
 TEST_F(CausalDiscoveryTest, SmokeTestFCIWithLargerDataset)
 {
     auto data = std::make_shared<Dataset>(std::initializer_list<Column>{
-        {1, 2, 3, 4, 5},   // Variable 0
-        { 2, 3, 4, 5, 6 },   // Variable 1 (correlated with Variable 0)
-        { 1, 1, 2, 2, 3 },   // Variable 2 (correlated with Variable 3)
-        { 2, 2, 3, 3, 4 },   // Variable 3 (correlated with Variable 2)
-        { 5, 4, 3, 2, 1 }    // Variable 4 (negatively correlated with Variable 0)
+        {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20},  // Variable 0
+        { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },  // Variable 1 (moderately correlated with Variable 0)
+        { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },  // Variable 6 (similar pattern to Variable 0)
+        { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 },  // Variable 8 (moderate correlation with Variable 0)
+        { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29 },  // Variable 9 (similar pattern to Variable 8)
+        { 1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 },  // Variable 10 (linear pattern, less correlated with Variables 0 and 1)
+        { 38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0 },  // Variable 11 (inverse pattern with Variable 10)
+        { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },  // Variable 15 (linear pattern similar to Variables 0 and 1)
+        { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48 },  // Variable 16 (linear pattern with step size)
+        { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 },  // Variable 17 (similar to Variable 6)
+        { 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 },  // Variable 18 (inverse pattern similar to Variable 7)
+        { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40 }  // Variable 19 (evenly spaced)
     });
-
 
     auto graph = std::make_shared<Graph>(data);
 

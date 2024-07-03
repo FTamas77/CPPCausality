@@ -1,65 +1,118 @@
 #include "statistic.h"
 #include "dataset.h"
-#include <vector>
-#include <memory>
-#include <numeric>
-#include <cmath>
 #include <boost/math/distributions/students_t.hpp>
+#include <Eigen/Dense>
+#include <Eigen/QR>
+#include <numeric>
+#include <limits>
+#include <stdexcept>
+#include <iostream>
+#include <vector>
+#include <set>
 
-/*
-double Statistic::performStatisticalTest(const std::shared_ptr<Column> data_i,
-                                         const std::shared_ptr<Column> data_j,
-                                         const std::vector<std::shared_ptr<Column>> data_conditioningSet)
-{
-    // Compute the means of the two samples
-    double mean1 = std::accumulate(data_i->begin(), data_i->end(), 0.0) / data_i->size();
-    double mean2 = std::accumulate(data_j->begin(), data_j->end(), 0.0) / data_j->size();
+using namespace Eigen;
+using namespace std;
 
-    // Compute the variances of the two samples
-    double variance1 = std::inner_product(data_i->begin(), data_i->end(), data_i->begin(), 0.0) / data_i->size() - mean1 * mean1;
-    double variance2 = std::inner_product(data_j->begin(), data_j->end(), data_j->begin(), 0.0) / data_j->size() - mean2 * mean2;
+double Statistic::testConditionalIndependence(const shared_ptr<const Dataset>& data, int i, int j, const set<int>& conditioningSet) {
+    // Retrieve data columns for the variables i and j
+    shared_ptr<Column> data_i = data->getColumn(i);
+    shared_ptr<Column> data_j = data->getColumn(j);
 
-    // Compute the pooled standard deviation
-    double pooledStdDev = std::sqrt((variance1 / data_i->size() + variance2 / data_j->size()) / 2);
-
-    // Compute the t statistic
-    double t = (mean1 - mean2) / (pooledStdDev * std::sqrt(1.0 / data_i->size() + 1.0 / data_j->size()));
-
-    // Compute the degrees of freedom
-    double degreesOfFreedom = data_i->size() + data_j->size() - 2;
-
-    // Create a Students t distribution
-    boost::math::students_t dist(degreesOfFreedom);
-
-    // Compute the p-value
-    double p = 2 * (1 - boost::math::cdf(dist, std::abs(t)));
-
-    return p;
-}
-*/
-
-double Statistic::performStatisticalTest(const Dataset &data, int i, int j, const std::set<int> &conditioningSet)
-{
-    // This function should implement the statistical test using the indices of the columns.
-    // Retrieve column data based on indices and perform the test.
-    std::shared_ptr<Column> data_i = data.getColumn(i);
-    std::shared_ptr<Column> data_j = data.getColumn(j);
-
-    std::vector<std::shared_ptr<Column>> data_conditioningSet;
-    for (int k : conditioningSet)
-    {
-        std::shared_ptr<Column> column_k = data.getColumn(k);
-        if (column_k)
-        {
-            data_conditioningSet.push_back(column_k);
-        }
-        else
-        {
-            throw std::runtime_error("Invalid column data");
-        }
+    // Check if data columns are valid
+    if (!data_i || !data_j) {
+        throw runtime_error("Invalid column data.");
     }
 
-    // Perform the actual statistical test with data_i, data_j, and data_conditioningSet
-    // This is a placeholder. Replace it with actual test logic.
-    return 0.05; // Placeholder p-value
+    // Convert data columns to std::vector for easier manipulation
+    vector<double> col_i(data_i->begin(), data_i->end());
+    vector<double> col_j(data_j->begin(), data_j->end());
+
+    size_t num_rows = col_i.size();
+    size_t num_conditioning_cols = conditioningSet.size();
+
+    // Handle the case where there are no conditioning variables
+    if (num_conditioning_cols == 0) {
+        // Map std::vector to Eigen's VectorXd
+        VectorXd vec_i = Eigen::Map<VectorXd>(col_i.data(), col_i.size());
+        VectorXd vec_j = Eigen::Map<VectorXd>(col_j.data(), col_j.size());
+
+        // Calculate means and standard deviations
+        double mean_i = vec_i.mean();
+        double mean_j = vec_j.mean();
+        double stdev_i = sqrt((vec_i.array() - mean_i).square().sum() / (vec_i.size() - 1));
+        double stdev_j = sqrt((vec_j.array() - mean_j).square().sum() / (vec_j.size() - 1));
+
+        // Calculate the correlation
+        double corr = (vec_i.dot(vec_j) - num_rows * mean_i * mean_j) / ((num_rows - 1) * stdev_i * stdev_j);
+
+        // Calculate the t-statistic
+        double t_statistic = corr * sqrt((num_rows - 2) / (1 - corr * corr));
+
+        // Calculate the p-value using Student's t-distribution
+        boost::math::students_t dist(num_rows - 2);
+        double p_value = 2 * boost::math::cdf(boost::math::complement(dist, abs(t_statistic)));
+
+        return p_value;
+    }
+
+    // Ensure there are enough rows to perform the analysis
+    if (num_rows <= num_conditioning_cols + 2) {
+        throw runtime_error("Not enough rows to form a valid X matrix.");
+    }
+
+    // Create the design matrix for the conditioning set
+    MatrixXd designMatrix(num_rows, num_conditioning_cols + 2);
+    designMatrix.col(0) = Eigen::Map<VectorXd>(col_i.data(), col_i.size());
+    designMatrix.col(1) = Eigen::Map<VectorXd>(col_j.data(), col_j.size());
+
+    size_t colIndex = 2;
+    for (int k : conditioningSet) {
+        shared_ptr<Column> column_k = data->getColumn(k);
+        if (!column_k) {
+            throw runtime_error("Invalid column data.");
+        }
+        vector<double> col_k(column_k->begin(), column_k->end());
+        designMatrix.col(colIndex) = Eigen::Map<VectorXd>(col_k.data(), col_k.size());
+        colIndex++;
+    }
+
+    // Extract X and y matrices
+    MatrixXd X = designMatrix.block(0, 2, num_rows, num_conditioning_cols);
+    VectorXd y_i = designMatrix.col(0);
+    VectorXd y_j = designMatrix.col(1);
+
+    // Ensure X and y_i, y_j are valid
+    if (X.rows() == 0 || X.cols() == 0 || y_i.size() == 0 || y_j.size() == 0) {
+        throw runtime_error("One or more matrices/vectors are empty.");
+    }
+
+    // Compute beta coefficients using QR decomposition
+    VectorXd beta_i = X.colPivHouseholderQr().solve(y_i);
+    VectorXd beta_j = X.colPivHouseholderQr().solve(y_j);
+
+    // Compute residuals
+    VectorXd residuals_i = y_i - X * beta_i;
+    VectorXd residuals_j = y_j - X * beta_j;
+
+    // Calculate the correlation between residuals
+    double residual_corr = residuals_i.dot(residuals_j) / (sqrt(residuals_i.squaredNorm()) * sqrt(residuals_j.squaredNorm()));
+
+    // Check for near ±1 correlations
+    if (abs(residual_corr) >= 1.0 - numeric_limits<double>::epsilon()) {
+        cerr << "Residuals correlation too close to ±1: " << residual_corr << endl;
+        return std::numeric_limits<double>::infinity(); // Returning infinity to indicate a special case
+    }
+
+    // Convert sizes to integers for calculation
+    int n = static_cast<int>(num_rows);  // Explicit conversion
+    int k = static_cast<int>(num_conditioning_cols);  // Explicit conversion
+
+    // Calculate the t-statistic
+    double t_statistic = residual_corr * sqrt((n - k - 2) / (1 - residual_corr * residual_corr));
+
+    // Calculate the p-value using Student's t-distribution
+    boost::math::students_t dist(n - k - 2);
+    double p_value = 2 * boost::math::cdf(boost::math::complement(dist, abs(t_statistic)));
+
+    return p_value;
 }
