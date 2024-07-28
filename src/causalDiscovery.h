@@ -29,6 +29,8 @@ class CausalDiscovery
 
     std::set<std::pair<int, int>> identifyPossibleDSep(std::shared_ptr<Graph> graph);
 
+    bool shouldOrientEdge(std::shared_ptr<Graph> graph, int node1, int node2, double alpha);
+
     void applyFCIRules(std::shared_ptr<Graph> graph, double alpha, const std::set<std::pair<int, int>> &possibleDSep);
 
     // Step 6

@@ -60,8 +60,8 @@ void CausalDiscovery::applyPCAlgorithm(std::shared_ptr<Graph> graph, double alph
 
                 if (independent)
                 {
-                    graph->removeUndirectedEdge(i, j);
-                    graph->removeUndirectedEdge(j, i);
+                    graph->removeEdge(i, j);
+                    graph->removeEdge(j, i);
                     break;
                 }
                 else
@@ -85,20 +85,25 @@ void CausalDiscovery::pruneGraph(std::shared_ptr<Graph> graph, double alpha)
 {
     std::shared_ptr<const Dataset> data = graph->getDataset();
 
-    for (int X = 0; X < graph->getNumVertices(); ++X)
+    for (int conditioningNode = 0; conditioningNode < graph->getNumVertices(); ++conditioningNode)
     {
-        auto neighbors = graph->getNeighbors(X);
+        auto neighbors = graph->getNeighbors(conditioningNode);
         for (int i = 0; i < neighbors.size(); ++i)
         {
             for (int j = i + 1; j < neighbors.size(); ++j)
             {
-                int Y = neighbors[i];
-                int Z = neighbors[j];
-                double p_value = Statistic::testConditionalIndependence(data, Y, Z, {X});
-                bool independent = p_value > alpha;
-                if (independent)
+                int firstNeighbor = neighbors[i];
+                int secondNeighbor = neighbors[j];
+
+                // Check if an edge exists between firstNeighbor and secondNeighbor before running the independence test
+                if (graph->hasEdge(firstNeighbor, secondNeighbor))
                 {
-                    graph->removeUndirectedEdge(Y, Z);
+                    double p_value = Statistic::testConditionalIndependence(data, firstNeighbor, secondNeighbor, { conditioningNode });
+                    bool independent = p_value > alpha;
+                    if (independent)
+                    {
+                        graph->removeEdge(firstNeighbor, secondNeighbor);
+                    }
                 }
             }
         }
@@ -227,22 +232,42 @@ std::set<std::pair<int, int>> CausalDiscovery::identifyPossibleDSep(std::shared_
     return dsepSet;
 }
 
+bool CausalDiscovery::shouldOrientEdge(std::shared_ptr<Graph> graph, int node1, int node2, double alpha) {
+    // Placeholder for actual FCI rule logic
+    // For example, you might check for certain conditions in the graph
+    // and decide whether to orient the edge from node1 to node2
+    // This is a simplified example and should be replaced with actual FCI rules
+
+    // Example condition: If node1 has a directed edge to node2, orient the edge
+    if (graph->hasDirectedEdge(node1, node2)) {
+        return true;
+    }
+
+    // Example condition: If node2 has a directed edge to node1, orient the edge in the opposite direction
+    if (graph->hasDirectedEdge(node2, node1)) {
+        graph->orientEdge(node2, node1);
+        return false;
+    }
+
+    // Add more FCI rules as needed
+    return false;
+}
+
 void CausalDiscovery::applyFCIRules(std::shared_ptr<Graph> graph, double alpha, const std::set<std::pair<int, int>> &possibleDSep)
 {
-    for (const auto& edge : graph->getEdges())
-    {
+    for (const auto& edge : graph->getEdges()) {
         int node1 = std::get<0>(edge);
         int node2 = std::get<1>(edge);
         bool isOriented = std::get<2>(edge);
 
-        if (possibleDSep.find({ node1, node2 }) != possibleDSep.end())
-        {
+        if (possibleDSep.find({ node1, node2 }) != possibleDSep.end()) {
             // Apply FCI rules to orient the edge
-            // This is a placeholder. Replace with actual FCI rule application.
-            if (!isOriented)
-            {
-                // Example placeholder for an FCI rule
-                graph->orientEdge(node1, node2);
+            if (!isOriented) {
+                // Example FCI rule: Orient the edge based on some condition
+                // This is a placeholder. Replace with actual FCI rule application.
+                if (shouldOrientEdge(graph, node1, node2, alpha)) {
+                    graph->orientEdge(node1, node2);
+                }
             }
         }
     }
