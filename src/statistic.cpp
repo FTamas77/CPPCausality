@@ -27,6 +27,13 @@ double Statistic::testConditionalIndependence(const shared_ptr<const Dataset>& d
     vector<double> col_i(data_i->begin(), data_i->end());
     vector<double> col_j(data_j->begin(), data_j->end());
 
+    // Check if either variable is constant
+    if (all_of(col_i.begin(), col_i.end(), [&](double val) { return val == col_i[0]; }) ||
+        all_of(col_j.begin(), col_j.end(), [&](double val) { return val == col_j[0]; })) {
+        cerr << "One of the variables is constant: " << (all_of(col_i.begin(), col_i.end(), [&](double val) { return val == col_i[0]; }) ? "i" : "j") << endl;
+        return 1.0; // Return a high p-value indicating non-independence
+    }
+
     size_t num_rows = col_i.size();
     size_t num_conditioning_cols = conditioningSet.size();
 
@@ -42,15 +49,35 @@ double Statistic::testConditionalIndependence(const shared_ptr<const Dataset>& d
         double stdev_i = sqrt((vec_i.array() - mean_i).square().sum() / (vec_i.size() - 1));
         double stdev_j = sqrt((vec_j.array() - mean_j).square().sum() / (vec_j.size() - 1));
 
+        // Ensure standard deviations are not zero to avoid division by zero
+        if (stdev_i == 0 || stdev_j == 0) {
+            return 1.0; // Return a high p-value indicating non-independence
+        }
+
         // Calculate the correlation
         double corr = (vec_i.dot(vec_j) - num_rows * mean_i * mean_j) / ((num_rows - 1) * stdev_i * stdev_j);
+
+        // Check if correlation is NaN or Inf
+        if (std::isnan(corr) || std::isinf(corr)) {
+            return 1.0; // Return a high p-value indicating non-independence
+        }
 
         // Calculate the t-statistic
         double t_statistic = corr * sqrt((num_rows - 2) / (1 - corr * corr));
 
+        // Check for NaN or Inf in t-statistic
+        if (std::isnan(t_statistic) || std::isinf(t_statistic)) {
+            return 1.0; // Return a high p-value indicating non-independence
+        }
+
         // Calculate the p-value using Student's t-distribution
         boost::math::students_t dist(num_rows - 2);
         double p_value = 2 * boost::math::cdf(boost::math::complement(dist, abs(t_statistic)));
+
+        // Ensure p_value is within valid range
+        if (std::isinf(p_value) || std::isnan(p_value)) {
+            return 1.0; // Return a high p-value indicating non-independence
+        }
 
         return p_value;
     }
@@ -72,6 +99,13 @@ double Statistic::testConditionalIndependence(const shared_ptr<const Dataset>& d
             throw runtime_error("Invalid column data.");
         }
         vector<double> col_k(column_k->begin(), column_k->end());
+
+        // Check if the column is constant
+        if (all_of(col_k.begin(), col_k.end(), [&](double val) { return val == col_k[0]; })) {
+            cerr << "Conditioning set contains a constant column: " << k << endl;
+            return 1.0; // Return a high p-value indicating non-independence
+        }
+
         designMatrix.col(colIndex) = Eigen::Map<VectorXd>(col_k.data(), col_k.size());
         colIndex++;
     }
@@ -100,7 +134,7 @@ double Statistic::testConditionalIndependence(const shared_ptr<const Dataset>& d
     // Check for near ±1 correlations
     if (abs(residual_corr) >= 1.0 - numeric_limits<double>::epsilon()) {
         cerr << "Residuals correlation too close to ±1: " << residual_corr << endl;
-        return std::numeric_limits<double>::infinity(); // Returning infinity to indicate a special case
+        return 1.0; // Return a high p-value indicating non-independence
     }
 
     // Convert sizes to integers for calculation
@@ -110,9 +144,20 @@ double Statistic::testConditionalIndependence(const shared_ptr<const Dataset>& d
     // Calculate the t-statistic
     double t_statistic = residual_corr * sqrt((n - k - 2) / (1 - residual_corr * residual_corr));
 
+    // Check for NaN or Inf in t-statistic
+    if (std::isnan(t_statistic) || std::isinf(t_statistic)) {
+        return 1.0; // Return a high p-value indicating non-independence
+    }
+
     // Calculate the p-value using Student's t-distribution
     boost::math::students_t dist(n - k - 2);
     double p_value = 2 * boost::math::cdf(boost::math::complement(dist, abs(t_statistic)));
+
+    // Ensure p_value is within valid range
+    if (std::isinf(p_value) || std::isnan(p_value)) {
+        cerr << "Invalid p-value computed: " << p_value << endl;
+        return 1.0; // Return a high p-value indicating non-independence
+    }
 
     return p_value;
 }
