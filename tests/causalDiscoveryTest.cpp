@@ -28,7 +28,7 @@ protected:
 
 TEST_F(CausalDiscoveryTest, SmokeTestFCIWithLargerDataset)
 {
-    auto data = std::make_shared<Dataset>(std::initializer_list<Column>{
+    auto data = std::make_shared<Dataset>(std::vector<Column>{
         {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20},  // Variable 0
         { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },  // Variable 1 (moderately correlated with Variable 0)
         { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },  // Variable 6 (similar pattern to Variable 0)
@@ -52,12 +52,19 @@ TEST_F(CausalDiscoveryTest, SmokeTestFCIWithLargerDataset)
     fci.runFCI(graph, alpha);
 
     auto expectedGraph = std::make_shared<Graph>(data);
-    expectedGraph->addUndirectedEdge(0, 1);
-    expectedGraph->addUndirectedEdge(2, 3);
-    expectedGraph->addUndirectedEdge(0, 4);
+    expectedGraph->addDirectedEdge(0, 1);  // Variable 0 influences Variable 1
+    expectedGraph->addUndirectedEdge(0, 6);  // Variable 0 and Variable 6 are similar
+    expectedGraph->addDirectedEdge(0, 8);  // Variable 0 influences Variable 8
+    expectedGraph->addUndirectedEdge(8, 9);  // Variable 8 and Variable 9 are similar
+    expectedGraph->addDirectedEdge(10, 11);  // Variable 10 influences Variable 11 inversely
+    expectedGraph->addUndirectedEdge(0, 15);  // Variable 0 and Variable 15 are similar
+    expectedGraph->addDirectedEdge(10, 16);  // Variable 10 influences Variable 16
+    expectedGraph->addDirectedEdge(0, 17);  // Variable 0 influences Variable 17
+    expectedGraph->addDirectedEdge(7, 18);  // Variable 7 influences Variable 18 inversely
+    expectedGraph->addDirectedEdge(10, 19);  // Variable 10 influences Variable 19
+
 
     ASSERT_EQ(graph, expectedGraph) << "FCI algorithm should produce the expected graph structure";
-
 }
 
 int main(int argc, char **argv)
