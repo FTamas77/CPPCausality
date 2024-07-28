@@ -4,8 +4,9 @@
 #include <vector>
 #include <cstddef>
 #include <memory>
+#include <utility> // For std::move
 
-typedef std::vector<int> Column;
+typedef std::vector<double> Column;
 
 class Dataset
 {
@@ -15,19 +16,26 @@ public:
 
     Dataset() = default;
 
-    Dataset(std::initializer_list<Column> init_list)
+    Dataset(std::vector<Column> init_vector)
     {
-        m_columns.reserve(init_list.size());
+        m_columns.reserve(init_vector.size());
 
-        for (const auto& column : init_list)
+        for (auto& column : init_vector)
         {
-            addColumn(column);
+            addColumn(std::move(column));
         }
     }
 
-    void addColumn(const Column &column)
+    virtual ~Dataset() = default;
+
+    void addColumn(const Column& column)
     {
         m_columns.push_back(std::make_shared<Column>(column));
+    }
+
+    void addColumn(Column&& column)
+    {
+        m_columns.push_back(std::make_shared<Column>(std::move(column)));
     }
 
     size_t getNumOfColumns() const
@@ -35,7 +43,7 @@ public:
         return m_columns.size();
     }
 
-    std::shared_ptr<Column> getColumn(int i) const
+    virtual std::shared_ptr<Column> getColumn(int i) const
     {
         if (i >= 0 && i < m_columns.size())
         {
