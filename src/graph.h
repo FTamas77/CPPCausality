@@ -3,7 +3,7 @@
 
 #include "dataset.h"
 #include <vector>
-#include <set>
+#include <unordered_set>
 #include <memory>
 #include <algorithm>
 #include <iostream>
@@ -12,7 +12,7 @@
 class Graph
 {
 public:
-    using EdgeList = std::set<int>;
+    using NeighborSet = std::unordered_set<int>;
 
     Graph() = delete;
 
@@ -23,12 +23,11 @@ public:
     void addDirectedEdge(int src, int dest);
     void addUndirectedEdge(int src, int dest);
 
+    bool hasEdge(int src, int dest) const;
     bool hasDirectedEdge(int src, int dest) const;
     bool hasUndirectedEdge(int src, int dest) const;
 
-    // TODO: maybe removeEdge(int src, int dest) instead of removeDirectedEdge and removeUndirectedEdge
-    void removeDirectedEdge(int src, int dest);
-    void removeUndirectedEdge(int src, int dest);
+    void removeEdge(int src, int dest);
 
     size_t getNumVertices() const;
 
@@ -45,7 +44,7 @@ public:
     friend bool operator==(const std::shared_ptr<Graph>& lhs, const std::shared_ptr<Graph>& rhs);
 
 private:
-    std::vector<EdgeList> m_adjList;
+    std::vector<NeighborSet> m_adjList;
 
     std::shared_ptr<Dataset> m_dataset;
 };

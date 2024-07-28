@@ -32,6 +32,13 @@ void Graph::addUndirectedEdge(int src, int dest) {
     }
 }
 
+bool Graph::hasEdge(int src, int dest) const {
+    if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
+        return m_adjList[src].find(dest) != m_adjList[src].end();
+    }
+    return false;
+}
+
 bool Graph::hasDirectedEdge(int src, int dest) const {
     if (src >= 0 && src < m_adjList.size()) {
         return m_adjList[src].find(dest) != m_adjList[src].end();
@@ -50,16 +57,13 @@ bool Graph::hasUndirectedEdge(int src, int dest) const {
     return false;
 }
 
-void Graph::removeDirectedEdge(int src, int dest) {
-    if (src >= 0 && src < m_adjList.size()) {
-        m_adjList[src].erase(dest);
-    }
-}
-
-void Graph::removeUndirectedEdge(int src, int dest) {
+void Graph::removeEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
         m_adjList[src].erase(dest);
-        m_adjList[dest].erase(src);
+        if (m_adjList[dest].find(src) != m_adjList[dest].end()) {
+            // If the reverse edge exists, it's an undirected edge
+            m_adjList[dest].erase(src);
+        }
     }
 }
 
@@ -88,11 +92,11 @@ void Graph::printGraph() const {
         for (const auto& dest : m_adjList[i]) {
             if (m_adjList[dest].find(i) != m_adjList[dest].end()) {
                 // There is an edge from dest to i as well, so it's undirected
-                std::cout << " | --- " << dest << " (undirected)";
+                std::cout << " | --- " << dest << " (undirected)" << std::endl;
             }
             else {
                 // There is no edge from dest to i, so it's directed
-                std::cout << " | --> " << dest << " (directed)";
+                std::cout << " | --> " << dest << " (directed)" << std::endl;
             }
         }
 
