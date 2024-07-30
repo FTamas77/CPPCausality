@@ -29,7 +29,6 @@ double Statistic::testConditionalIndependence(const shared_ptr<const Dataset>& d
     return handleConditioning(data, i, j, conditioningSet, col_i, col_j, num_rows, num_conditioning_cols);
 }
 
-// Retrieve data columns and validate them
 pair<vector<double>, vector<double>> Statistic::retrieveAndValidateData(const shared_ptr<const Dataset>& data, int i, int j) {
     shared_ptr<Column> data_i = data->getColumn(i);
     shared_ptr<Column> data_j = data->getColumn(j);
@@ -48,12 +47,10 @@ pair<vector<double>, vector<double>> Statistic::retrieveAndValidateData(const sh
     return { col_i, col_j };
 }
 
-// Check if a vector is constant
 bool Statistic::isConstant(const vector<double>& vec) {
     return all_of(vec.begin(), vec.end(), [&](double val) { return val == vec[0]; });
 }
 
-// Handle cases with no conditioning variables
 double Statistic::handleNoConditioning(const vector<double>& col_i, const vector<double>& col_j) {
     size_t num_rows = col_i.size();
     VectorXd vec_i = Eigen::Map<const VectorXd>(col_i.data(), col_i.size());
@@ -81,7 +78,6 @@ double Statistic::handleNoConditioning(const vector<double>& col_i, const vector
     return computePValue(t_statistic, num_rows, 0);
 }
 
-// Handle cases with conditioning variables
 double Statistic::handleConditioning(const shared_ptr<const Dataset>& data, int i, int j, const set<int>& conditioningSet, const vector<double>& col_i, const vector<double>& col_j, size_t num_rows, size_t num_conditioning_cols) {
     MatrixXd designMatrix(num_rows, num_conditioning_cols + 2);
     designMatrix.col(0) = Eigen::Map<const VectorXd>(col_i.data(), col_i.size());
@@ -126,7 +122,6 @@ double Statistic::handleConditioning(const shared_ptr<const Dataset>& data, int 
     return computePValue(t_statistic, num_rows, num_conditioning_cols);
 }
 
-// Compute the correlation between residuals
 double Statistic::computeResidualCorrelation(const MatrixXd& X, const VectorXd& y_i, const VectorXd& y_j) {
     VectorXd beta_i = X.colPivHouseholderQr().solve(y_i);
     VectorXd beta_j = X.colPivHouseholderQr().solve(y_j);
@@ -137,12 +132,10 @@ double Statistic::computeResidualCorrelation(const MatrixXd& X, const VectorXd& 
     return residuals_i.dot(residuals_j) / (sqrt(residuals_i.squaredNorm()) * sqrt(residuals_j.squaredNorm()));
 }
 
-// Compute the t-statistic
 double Statistic::computeTStatistic(double correlation, size_t num_rows, size_t num_conditioning_cols) {
     return correlation * sqrt((num_rows - num_conditioning_cols - 2) / (1 - correlation * correlation));
 }
 
-// Compute the p-value from the t-statistic
 double Statistic::computePValue(double t_statistic, size_t num_rows, size_t num_conditioning_cols) {
     boost::math::students_t dist(num_rows - num_conditioning_cols - 2);
     double p_value = 2 * boost::math::cdf(boost::math::complement(dist, abs(t_statistic)));
