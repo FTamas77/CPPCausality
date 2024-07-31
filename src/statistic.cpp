@@ -72,7 +72,7 @@ double Statistic::handleNoConditioning(const vector<double>& col_i, const vector
 
     double t_statistic = corr * sqrt((num_rows - 2) / (1 - corr * corr));
     if (std::isnan(t_statistic) || std::isinf(t_statistic)) {
-        return 1.0;
+        return 1e-10; // Return a very small p-value indicating dependence
     }
 
     return computePValue(t_statistic, num_rows, 0);
