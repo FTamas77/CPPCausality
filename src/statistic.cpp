@@ -108,13 +108,22 @@ double Statistic::handleConditioning(const shared_ptr<const Dataset>& data, int 
         throw runtime_error("One or more matrices/vectors are empty.");
     }
 
+    // Debugging intermediate values
+    cout << "Design Matrix X:" << endl << X << endl;
+    cout << "y_i:" << endl << y_i.transpose() << endl;
+    cout << "y_j:" << endl << y_j.transpose() << endl;
+
     double residual_corr = computeResidualCorrelation(X, y_i, y_j);
+    cout << "Residual Correlation: " << residual_corr << endl;
+
     if (abs(residual_corr) >= 1.0 - numeric_limits<double>::epsilon()) {
         cerr << "Residuals correlation too close to ±1: " << residual_corr << endl;
-        return 1.0;
+        return 1e-10; // Return a very small p-value indicating dependence
     }
 
     double t_statistic = computeTStatistic(residual_corr, num_rows, num_conditioning_cols);
+    cout << "T-Statistic: " << t_statistic << endl;
+
     if (std::isnan(t_statistic) || std::isinf(t_statistic)) {
         return 1.0;
     }
@@ -129,8 +138,17 @@ double Statistic::computeResidualCorrelation(const MatrixXd& X, const VectorXd& 
     VectorXd residuals_i = y_i - X * beta_i;
     VectorXd residuals_j = y_j - X * beta_j;
 
+    cout << "Residuals_i: " << residuals_i.transpose() << endl;
+    cout << "Residuals_j: " << residuals_j.transpose() << endl;
+
+    if (residuals_i.norm() < numeric_limits<double>::epsilon() || residuals_j.norm() < numeric_limits<double>::epsilon()) {
+        cerr << "Residuals are too small, indicating perfect correlation or near-zero variance." << endl;
+        return 1.0; // Return a very small p-value indicating dependence
+    }
+
     return residuals_i.dot(residuals_j) / (sqrt(residuals_i.squaredNorm()) * sqrt(residuals_j.squaredNorm()));
 }
+
 
 double Statistic::computeTStatistic(double correlation, size_t num_rows, size_t num_conditioning_cols) {
     return correlation * sqrt((num_rows - num_conditioning_cols - 2) / (1 - correlation * correlation));
