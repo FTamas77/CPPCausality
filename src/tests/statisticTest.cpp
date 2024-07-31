@@ -56,14 +56,14 @@ INSTANTIATE_TEST_SUITE_P(
         TestCase{ "Basic example with a small dataset and a conditioning set", { { 1, 2.1, 3.2, 4.3, 5.4 }, { 2, 4.1, 6.2, 8.3, 10.4 }, { 1.5, 2.1, 1.6, 2.2, 1.7 } }, 0, 1, { 2 }, false },
         TestCase{ "Another small dataset with no conditioning set", { { 1, 2.01, 3.02 }, { 2, 4.01, 6.02 }, { 1.1, 2.02, 3.04 } }, 0, 1, {}, true },
         TestCase{ "Testing with a constant column", { { 1, 1, 1, 1, 1 }, { 2, 3, 4, 5, 6 }, { 1.1, 2.1, 3.1, 4.1, 5.1 } }, 0, 1, {}, true },
-        TestCase{ "Moderate dataset with conditioning set", { { 1, 2, 3, 4, 5 }, { 2, 4, 6, 8, 10 }, { 3, 4, 5, 6, 7 } }, 0, 1, { 2 }, true },
+        TestCase{ "Moderate dataset with conditioning set", { { 1, 2, 3, 4, 5 }, { 2, 4, 6, 8, 10 }, { 3, 4, 5, 6, 7 } }, 0, 1, { 2 }, false },
         TestCase{ "Corrected correlation without conditioning set", { { 1, 2, 3, 4, 5 }, { 2, 4, 6, 8, 10 }, { 3, 4, 5, 6, 7 } }, 0, 1, {}, false },
         TestCase{ "Perfect correlation with conditioning set", { { 1, 2, 3, 4, 5 }, { 1, 2, 3, 4, 5 }, { 1, 2, 3, 4, 5 } }, 0, 1, { 2 }, false },
         TestCase{ "Removed constant column from conditioning set", { { 1, 2, 3, 4, 5 }, { 5, 4, 3, 2, 1 }, { 1, 2, 3, 4, 5 } }, 0, 1, {}, false },
         TestCase{ "No constant columns", { { 1, 2, 3, 4, 5 }, { 2, 4, 6, 8, 10 }, { 3, 4, 5, 6, 7 } }, 0, 1, { 2 }, false },
         TestCase{ "Different columns with corrected conditioning set", { { 1, 2, 3, 4, 5 }, { 2, 4, 6, 8, 10 }, { 1, 2, 3, 4, 5 } }, 0, 2, { 1 }, false },
         TestCase{
-            "Fixed data for large dataset",
+            "Fixed data for large dataset 1",
             {
                 { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },
                 { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 },
