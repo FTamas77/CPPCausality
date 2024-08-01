@@ -100,7 +100,7 @@ void CausalDiscovery::pruneGraph(std::shared_ptr<Graph> graph, double alpha)
                 {
                     double p_value = Statistic::testConditionalIndependence(data, firstNeighbor, secondNeighbor, { conditioningNode });
                     bool independent = p_value > alpha;
-                    if (independent)
+                    if (independent) 
                     {
                         graph->removeEdge(firstNeighbor, secondNeighbor);
                     }

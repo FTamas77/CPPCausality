@@ -104,6 +104,64 @@ void Graph::printGraph() const {
     }
 }
 
+void Graph::compareGraphs(const Graph& other) const {
+    std::set<std::pair<int, int>> edges1, edges2;
+
+    // Collect edges from the current graph
+    for (int src = 0; src < getNumVertices(); ++src) {
+        for (int dest : getNeighbors(src)) {
+            edges1.insert({ src, dest });
+        }
+    }
+
+    // Collect edges from the other graph
+    for (int src = 0; src < other.getNumVertices(); ++src) {
+        for (int dest : other.getNeighbors(src)) {
+            edges2.insert({ src, dest });
+        }
+    }
+
+    // Find additional edges in the current graph
+    std::vector<std::pair<int, int>> additionalInCurrent;
+    for (const auto& edge : edges1) {
+        if (edges2.find(edge) == edges2.end()) {
+            additionalInCurrent.push_back(edge);
+        }
+    }
+
+    // Find additional edges in the other graph
+    std::vector<std::pair<int, int>> additionalInOther;
+    for (const auto& edge : edges2) {
+        if (edges1.find(edge) == edges1.end()) {
+            additionalInOther.push_back(edge);
+        }
+    }
+
+    // Find common edges
+    std::vector<std::pair<int, int>> commonEdges;
+    for (const auto& edge : edges1) {
+        if (edges2.find(edge) != edges2.end()) {
+            commonEdges.push_back(edge);
+        }
+    }
+
+    // Print results
+    std::cout << "Additional edges in the current graph:\n";
+    for (const auto& edge : additionalInCurrent) {
+        std::cout << edge.first << " -> " << edge.second << "\n";
+    }
+
+    std::cout << "Additional edges in the other graph:\n";
+    for (const auto& edge : additionalInOther) {
+        std::cout << edge.first << " -> " << edge.second << "\n";
+    }
+
+    std::cout << "Common edges in both graphs:\n";
+    for (const auto& edge : commonEdges) {
+        std::cout << edge.first << " -> " << edge.second << "\n";
+    }
+}
+
 std::vector<std::tuple<int, int, bool>> Graph::getEdges() const {
     std::vector<std::tuple<int, int, bool>> edges;
     std::set<std::pair<int, int>> addedEdges;

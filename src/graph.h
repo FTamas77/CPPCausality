@@ -37,6 +37,8 @@ public:
 
     void printGraph() const;
 
+    void compareGraphs(const Graph& other) const;
+
     std::vector<std::tuple<int, int, bool>> getEdges() const;
 
     friend bool operator==(const Graph& lhs, const Graph& rhs);
