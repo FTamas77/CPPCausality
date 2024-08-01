@@ -84,6 +84,14 @@ INSTANTIATE_TEST_SUITE_P(
                 { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },
                 { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 }
             },
-            0, 1, { }, false }
+            0, 1, { }, false },
+        TestCase{
+            "Conditioning set with constant column",
+            {
+                { 1, 2, 3, 4, 5 },  // col_0
+                { 2, 4, 6, 8, 10 }, // col_1
+                { 1, 1, 1, 1, 1 }   // col_2 (constant column)
+            },
+            0, 1, { 2 }, false}
     )
 );

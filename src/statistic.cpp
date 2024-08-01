@@ -77,7 +77,6 @@ double Statistic::handleNoConditioning(const vector<double>& col_i, const vector
 
     return computePValue(t_statistic, num_rows, 0);
 }
-
 double Statistic::handleConditioning(const shared_ptr<const Dataset>& data, int i, int j, const set<int>& conditioningSet, const vector<double>& col_i, const vector<double>& col_j, size_t num_rows, size_t num_conditioning_cols) {
     MatrixXd designMatrix(num_rows, num_conditioning_cols + 2);
     designMatrix.col(0) = Eigen::Map<const VectorXd>(col_i.data(), col_i.size());
@@ -93,7 +92,7 @@ double Statistic::handleConditioning(const shared_ptr<const Dataset>& data, int 
 
         if (isConstant(col_k)) {
             cerr << "Conditioning set contains a constant column: " << k << endl;
-            return 1.0;
+            return 1e-10; // Return a very small p-value indicating dependence
         }
 
         designMatrix.col(colIndex) = Eigen::Map<const VectorXd>(col_k.data(), col_k.size());
