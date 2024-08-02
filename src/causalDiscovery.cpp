@@ -58,6 +58,8 @@ void CausalDiscovery::applyPCAlgorithm(std::shared_ptr<Graph> graph, double alph
                 double p_value = Statistic::testConditionalIndependence(data, i, j, conditioningSet);
                 bool independent = p_value > alpha;
 
+                // TODO: add domain-specific rules whether remove edge or not
+
                 if (independent)
                 {
                     graph->removeEdge(i, j);
@@ -100,6 +102,9 @@ void CausalDiscovery::pruneGraph(std::shared_ptr<Graph> graph, double alpha)
                 {
                     double p_value = Statistic::testConditionalIndependence(data, firstNeighbor, secondNeighbor, { conditioningNode });
                     bool independent = p_value > alpha;
+
+                    // TODO: add domain-specific rules whether remove edge or not
+
                     if (independent) 
                     {
                         graph->removeEdge(firstNeighbor, secondNeighbor);
@@ -127,6 +132,10 @@ void CausalDiscovery::orientVStructures(std::shared_ptr<Graph> graph, double alp
                 {
                     double p_value = Statistic::testConditionalIndependence(data, X, Y, {Z});
                     bool independent = p_value > alpha;
+
+                    // TODO: maybe we could use domain-specific rules to orient the edges
+                    // but now, I wouldn't change on this
+
                     if (!independent)
                     {
                         graph->orientEdge(X, Z);
@@ -282,6 +291,8 @@ void CausalDiscovery::finalOrientation(std::shared_ptr<Graph> graph)
         int dest = std::get<1>(edge);
         bool isOriented = std::get<2>(edge);
 
+        // TODO: apply domain-specific rules
+
         // Orient the edge if it is not already oriented
         if (!isOriented)
         {
@@ -303,26 +314,26 @@ void CausalDiscovery::runFCI(std::shared_ptr<Graph> graph, double alpha)
 
     // Step 1
     createFullyConnectedGraph(graph);
-    graph->printGraph();
+    //graph->printGraph();
 
     // Step 2
     applyPCAlgorithm(graph, alpha);
-    graph->printGraph();
+    //graph->printGraph();
 
     // Step 3
     pruneGraph(graph, alpha);
-    graph->printGraph();
+    //graph->printGraph();
 
     // Step 4
     orientVStructures(graph, alpha);
-    graph->printGraph();
+    //graph->printGraph();
 
     // Step 5
     std::set<std::pair<int, int>> possibleDSep = identifyPossibleDSep(graph);
     applyFCIRules(graph, alpha, possibleDSep);
-    graph->printGraph();
+    //graph->printGraph();
 
     // Step 6
     finalOrientation(graph);
-    graph->printGraph();
+    //graph->printGraph();
 }
