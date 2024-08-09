@@ -12,8 +12,9 @@
     "\\doc",
     "\\OpenCL-Headers",
     "\\src",
+    "\\src\\tests",
     "\\tests"
   ],
-  "SelectedNode": "\\src\\statistic.cpp",
+  "SelectedNode": "\\tests\\causalDiscoveryTest.cpp",
   "PreviewInSolutionExplorer": false
 }
