@@ -2,7 +2,7 @@
 find_package(GTest REQUIRED)
 
 # Create a test executable
-add_executable(functionalTest causalDiscoveryTest.cpp dataFromOntologyTest.cpp)
+add_executable(functionalTest causalDiscoveryTest.cpp dataFromOntologyTest.cpp) # ontologyWithDiscoveryTest.cpp)
 
 # TODO: GTest::gtest GTest::gtest_main does not work
 message(STATUS "gtest_LIBRARIES_DEBUG: ${gtest_LIBRARIES_DEBUG}")
