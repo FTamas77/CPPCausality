@@ -25,10 +25,9 @@ private:
     std::string name;
     std::shared_ptr<ClassType> classType;
 
-    // Store object properties as a map of property names to individuals
+    // The first strings are the names of the properties (instances of ObjectProperty or DataProperty)
     std::unordered_map<std::string, std::shared_ptr<Individual>> objectProperties;
-
-    // Store data properties as a map of property names to values
+    // The second string is the value of the property (for instances of DataProperty)
     std::unordered_map<std::string, std::string> dataProperties;
 };
 

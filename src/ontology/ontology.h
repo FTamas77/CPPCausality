@@ -20,7 +20,7 @@ public:
     std::shared_ptr<Individual> getIndividual(const std::string& name) const;
 
     void setObjectProperty(const std::string& individualName, const std::string& propertyName, const std::string& value);
-    void setDataProperty(const std::string& individualName, const std::string& propertyName, int value);
+    void setDataProperty(const std::string& individualName, const std::string& propertyName, const std::string& value);
 
 private:
     std::unordered_map<std::string, std::shared_ptr<ClassType>> classTypes;
