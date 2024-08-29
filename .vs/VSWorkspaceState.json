@@ -12,9 +12,8 @@
     "\\doc",
     "\\OpenCL-Headers",
     "\\src",
-    "\\src\\tests",
     "\\tests"
   ],
-  "SelectedNode": "\\tests\\causalDiscoveryTest.cpp",
+  "SelectedNode": "\\tests\\CMakeLists.txt",
   "PreviewInSolutionExplorer": false
 }
