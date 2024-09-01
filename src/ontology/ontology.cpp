@@ -11,13 +11,18 @@ std::shared_ptr<ClassType> Ontology::getClassType(const std::string& name) const
 }
 
 void Ontology::addProperty(const std::shared_ptr<Property>& property) {
-    // TODO: Check if property is valid or already exists
-    properties[property->getName()] = property;
+    properties.insert({ property->getName(), property });
 }
 
-std::shared_ptr<Property> Ontology::getProperty(const std::string& name) const {
-    auto it = properties.find(name);
-    return (it != properties.end()) ? it->second : nullptr;
+std::vector<std::shared_ptr<Property>> Ontology::getProperties(const std::string& name) const {
+    std::vector<std::shared_ptr<Property>> propertyList;
+    auto range = properties.equal_range(name);  // Get the range of properties with the same name
+
+    for (auto it = range.first; it != range.second; ++it) {
+        propertyList.push_back(it->second);
+    }
+
+    return propertyList;
 }
 
 void Ontology::addIndividual(const std::shared_ptr<Individual>& individual) {
@@ -31,46 +36,41 @@ std::shared_ptr<Individual> Ontology::getIndividual(const std::string& name) con
 }
 
 void Ontology::setObjectProperty(const std::string& individualName, const std::string& propertyName, const std::string& value) {
-
     auto individual = getIndividual(individualName);
     if (!individual) {
         throw std::runtime_error("Individual not found: " + individualName);
     }
 
-    auto property = getProperty(propertyName);
-    if (!property) {
+    auto properties = getProperties(propertyName);
+    if (properties.empty()) {
         throw std::runtime_error("Property not found: " + propertyName);
     }
-
-    /*if (property->getType() != PropertyType::ObjectProperty) {
-        throw std::runtime_error("Property is not an ObjectProperty: " + propertyName);
-    }*/
 
     auto targetIndividual = getIndividual(value);
     if (!targetIndividual) {
         throw std::runtime_error("Target individual not found: " + value);
     }
 
-    individual->setObjectProperty(propertyName, targetIndividual);
+    // Apply the object property to all matching properties
+    for (const auto& property : properties) {
+        individual->setObjectProperty(propertyName, targetIndividual);
+    }
 }
 
 void Ontology::setDataProperty(const std::string& individualName, const std::string& propertyName, const std::string& value) {
-
     auto individual = getIndividual(individualName);
     if (!individual) {
         throw std::runtime_error("Individual not found: " + individualName);
     }
 
-    auto property = getProperty(propertyName);
-    if (!property) {
+    auto properties = getProperties(propertyName);
+    if (properties.empty()) {
         throw std::runtime_error("Property not found: " + propertyName);
     }
 
-    /*if (property->getType() != PropertyType::DataProperty) {
-        throw std::runtime_error("Property is not a DataProperty: " + propertyName);
-    }*/
-
-    std::string valueStr = value;
-
-    individual->setDataPropertyValue(propertyName, valueStr);
+    for (const auto& property : properties) {
+        std::string valueStr = value;
+        individual->setDataPropertyValue(propertyName, valueStr);
+    }
 }
+

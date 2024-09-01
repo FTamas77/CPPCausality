@@ -25,19 +25,19 @@ void Graph::addDirectedEdge(int src, int dest) {
     }
 }
 
-void Graph::addUndirectedEdge(int src, int dest) {
+void Graph::addDoubleDirectedEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
         m_adjList[src].insert(dest);
         m_adjList[dest].insert(src);
     }
 }
 
-bool Graph::hasEdge(int src, int dest) const {
+/*bool Graph::hasEdge(int src, int dest) const {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
         return m_adjList[src].find(dest) != m_adjList[src].end();
     }
     return false;
-}
+}*/
 
 bool Graph::hasDirectedEdge(int src, int dest) const {
     if (src >= 0 && src < m_adjList.size()) {
@@ -47,7 +47,7 @@ bool Graph::hasDirectedEdge(int src, int dest) const {
     return false;
 }
 
-bool Graph::hasUndirectedEdge(int src, int dest) const {
+bool Graph::hasDoubleDirectedEdge(int src, int dest) const {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
         bool srcToDest = m_adjList[src].find(dest) != m_adjList[src].end();
         bool destToSrc = m_adjList[dest].find(src) != m_adjList[dest].end();
@@ -57,13 +57,10 @@ bool Graph::hasUndirectedEdge(int src, int dest) const {
     return false;
 }
 
-void Graph::removeEdge(int src, int dest) {
+void Graph::removeSingleEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
         m_adjList[src].erase(dest);
-        if (m_adjList[dest].find(src) != m_adjList[dest].end()) {
-            // If the reverse edge exists, it's an undirected edge
-            m_adjList[dest].erase(src);
-        }
+        // Note: we don't remove the edge from dest to src
     }
 }
 
@@ -79,11 +76,11 @@ std::vector<int> Graph::getNeighbors(int vertex) const {
     return {};
 }
 
-void Graph::orientEdge(int src, int dest) {
+/*void Graph::orientEdge(int src, int dest) {
     if (src >= 0 && src < m_adjList.size() && dest >= 0 && dest < m_adjList.size()) {
         m_adjList[dest].erase(src);
     }
-}
+}*/
 
 void Graph::printGraph() const {
     for (int i = 0; i < m_adjList.size(); ++i) {

@@ -1,2 +1,3 @@
 add_subdirectory(causalDiscovery)
 add_subdirectory(ontology)
+add_subdirectory(ontologyConstraints)

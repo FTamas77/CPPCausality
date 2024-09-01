@@ -7,6 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include <map>
 
 class Ontology {
 public:
@@ -14,7 +15,7 @@ public:
     std::shared_ptr<ClassType> getClassType(const std::string& name) const;
 
     void addProperty(const std::shared_ptr<Property>& property);
-    std::shared_ptr<Property> getProperty(const std::string& name) const;
+    std::vector<std::shared_ptr<Property>> getProperties(const std::string& name) const; // Return a vector of properties
 
     void addIndividual(const std::shared_ptr<Individual>& individual);
     std::shared_ptr<Individual> getIndividual(const std::string& name) const;
@@ -24,7 +25,8 @@ public:
 
 private:
     std::unordered_map<std::string, std::shared_ptr<ClassType>> classTypes;
-    std::unordered_map<std::string, std::shared_ptr<Property>> properties;
+    std::multimap<std::string, std::shared_ptr<Property>> properties;
+
     std::unordered_map<std::string, std::shared_ptr<Individual>> individuals;
 };
 

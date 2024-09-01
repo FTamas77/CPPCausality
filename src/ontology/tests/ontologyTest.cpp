@@ -40,13 +40,20 @@ TEST(OntologyTest, AddAndRetrieveObjectProperty) {
     auto objectProperty = make_shared<ObjectProperty>(propertyName, classType1, classType2);
     ontology.addProperty(objectProperty);
 
-    auto retrievedProperty = ontology.getProperty(propertyName);
-    ASSERT_NE(retrievedProperty, nullptr);
+    auto retrievedProperties = ontology.getProperties(propertyName);
+    ASSERT_FALSE(retrievedProperties.empty());  // Ensure that the property was added
 
-    auto retrievedObjectProperty = dynamic_pointer_cast<ObjectProperty>(retrievedProperty);
-    ASSERT_NE(retrievedObjectProperty, nullptr);
-    EXPECT_EQ(retrievedObjectProperty->getDomain()->getName(), className1);
-    EXPECT_EQ(retrievedObjectProperty->getRange()->getName(), className2);
+    bool found = false;
+    for (const auto& prop : retrievedProperties) {
+        auto retrievedObjectProperty = dynamic_pointer_cast<ObjectProperty>(prop);
+        if (retrievedObjectProperty &&
+            retrievedObjectProperty->getDomain()->getName() == className1 &&
+            retrievedObjectProperty->getRange()->getName() == className2) {
+            found = true;
+            break;
+        }
+    }
+    ASSERT_TRUE(found) << "Failed to find the expected ObjectProperty with domain and range";
 }
 
 TEST(OntologyTest, AddAndRetrieveIndividual) {
@@ -120,6 +127,45 @@ TEST(OntologyTest, SetAndRetrieveDataProperty) {
     auto retrievedDataProperty = retrievedIndividual->getDataPropertyValue(propertyName);
     ASSERT_FALSE(retrievedDataProperty.empty());
     EXPECT_EQ(retrievedDataProperty, "30");
+}
+
+TEST(OntologyTest, AddAndRetrieveMultiplePropertiesWithSameName) {
+    Ontology ontology;
+
+    string className1 = "Person";
+    string className2 = "Organization";
+    string className3 = "Project";
+    auto classType1 = createClassType(className1);
+    auto classType2 = createClassType(className2);
+    auto classType3 = createClassType(className3);
+    ontology.addClassType(classType1);
+    ontology.addClassType(classType2);
+    ontology.addClassType(classType3);
+
+    string propertyName = "worksFor";
+    auto objectProperty1 = make_shared<ObjectProperty>(propertyName, classType1, classType2);
+    auto objectProperty2 = make_shared<ObjectProperty>(propertyName, classType1, classType3);
+    ontology.addProperty(objectProperty1);
+    ontology.addProperty(objectProperty2);
+
+    auto retrievedProperties = ontology.getProperties(propertyName);
+    ASSERT_EQ(retrievedProperties.size(), 2);  // Expecting two properties with the same name
+
+    bool found1 = false, found2 = false;
+    for (const auto& prop : retrievedProperties) {
+        auto retrievedObjectProperty = dynamic_pointer_cast<ObjectProperty>(prop);
+        if (retrievedObjectProperty->getDomain()->getName() == className1 &&
+            retrievedObjectProperty->getRange()->getName() == className2) {
+            found1 = true;
+        }
+        if (retrievedObjectProperty->getDomain()->getName() == className1 &&
+            retrievedObjectProperty->getRange()->getName() == className3) {
+            found2 = true;
+        }
+    }
+
+    ASSERT_TRUE(found1) << "First ObjectProperty with domain Person and range Organization not found";
+    ASSERT_TRUE(found2) << "Second ObjectProperty with domain Person and range Project not found";
 }
 
 TEST(OntologyTest, DISABLED_AddPropertyWithInvalidDomainOrRange) {

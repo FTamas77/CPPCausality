@@ -8,8 +8,9 @@
 
 class CausalDiscovery
 {
-    // Step 1
+    // Step 1: create fully connected graph and remove forbidden edges
     void createFullyConnectedGraph(std::shared_ptr<Graph> graph);
+    void applyForbiddenEdges(std::shared_ptr<Graph> graph);
 
     // Step 2
     void addToConditioningSet(std::set<int> &conditioningSet, int numVertices, int i, int j);

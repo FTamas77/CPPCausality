@@ -19,7 +19,21 @@ void CausalDiscovery::createFullyConnectedGraph(std::shared_ptr<Graph> graph)
     {
         for (int j = i + 1; j < graph->getNumVertices(); ++j)
         {
-            graph->addUndirectedEdge(i, j);
+            graph->addDoubleDirectedEdge(i, j);
+        }
+    }
+}
+
+void CausalDiscovery::applyForbiddenEdges(std::shared_ptr<Graph> graph) {
+    const auto& forbiddenEdges = graph->getForbiddenEdges();
+
+    for (const auto& edge : forbiddenEdges) {
+        int from = edge.first;
+        int to = edge.second;
+
+        // Remove the directed edge if it exists
+        if (graph->hasDirectedEdge(from, to)) {
+            graph->removeSingleEdge(from, to);
         }
     }
 }
@@ -62,8 +76,8 @@ void CausalDiscovery::applyPCAlgorithm(std::shared_ptr<Graph> graph, double alph
 
                 if (independent)
                 {
-                    graph->removeEdge(i, j);
-                    graph->removeEdge(j, i);
+                    graph->removeSingleEdge(i, j);
+                    graph->removeSingleEdge(j, i);
                     break;
                 }
                 else
@@ -98,7 +112,7 @@ void CausalDiscovery::pruneGraph(std::shared_ptr<Graph> graph, double alpha)
                 int secondNeighbor = neighbors[j];
 
                 // Check if an edge exists between firstNeighbor and secondNeighbor before running the independence test
-                if (graph->hasEdge(firstNeighbor, secondNeighbor))
+                if (graph->hasDoubleDirectedEdge(firstNeighbor, secondNeighbor))
                 {
                     double p_value = Statistic::testConditionalIndependence(data, firstNeighbor, secondNeighbor, { conditioningNode });
                     bool independent = p_value > alpha;
@@ -107,7 +121,7 @@ void CausalDiscovery::pruneGraph(std::shared_ptr<Graph> graph, double alpha)
 
                     if (independent) 
                     {
-                        graph->removeEdge(firstNeighbor, secondNeighbor);
+                        graph->removeSingleEdge(firstNeighbor, secondNeighbor);
                     }
                 }
             }
@@ -128,7 +142,7 @@ void CausalDiscovery::orientVStructures(std::shared_ptr<Graph> graph, double alp
             {
                 int X = neighbors[i];
                 int Y = neighbors[j];
-                if (!graph->hasUndirectedEdge(X, Y))
+                if (!graph->hasDoubleDirectedEdge(X, Y))
                 {
                     double p_value = Statistic::testConditionalIndependence(data, X, Y, {Z});
                     bool independent = p_value > alpha;
@@ -138,8 +152,11 @@ void CausalDiscovery::orientVStructures(std::shared_ptr<Graph> graph, double alp
 
                     if (!independent)
                     {
-                        graph->orientEdge(X, Z);
-                        graph->orientEdge(Y, Z);
+                        //graph->orientEdge(X, Z);
+                        //graph->orientEdge(Y, Z);
+
+                        graph->removeSingleEdge(Z, X);
+                        graph->removeSingleEdge(Z, Y);
                     }
                 }
             }
@@ -253,8 +270,9 @@ bool CausalDiscovery::shouldOrientEdge(std::shared_ptr<Graph> graph, int node1, 
     }
 
     // Example condition: If node2 has a directed edge to node1, orient the edge in the opposite direction
-    if (graph->hasDirectedEdge(node2, node1)) {
-        graph->orientEdge(node2, node1);
+    if (graph->hasDoubleDirectedEdge(node2, node1)) {
+        //graph->orientEdge(node2, node1);
+        graph->removeSingleEdge(node1, node2);
         return false;
     }
 
@@ -275,7 +293,8 @@ void CausalDiscovery::applyFCIRules(std::shared_ptr<Graph> graph, double alpha, 
                 // Example FCI rule: Orient the edge based on some condition
                 // This is a placeholder. Replace with actual FCI rule application.
                 if (shouldOrientEdge(graph, node1, node2, alpha)) {
-                    graph->orientEdge(node1, node2);
+                    //graph->orientEdge(node1, node2);
+                    graph->removeSingleEdge(node2, node1);
                 }
             }
         }
@@ -299,11 +318,13 @@ void CausalDiscovery::finalOrientation(std::shared_ptr<Graph> graph)
             // Orient the edge from the lower-indexed vertex to the higher-indexed vertex
             if (src < dest)
             {
-                graph->orientEdge(src, dest);
+                //graph->orientEdge(src, dest);
+                graph->removeSingleEdge(dest, src);
             }
             else
             {
-                graph->orientEdge(dest, src);
+                //graph->orientEdge(dest, src);
+                graph->removeSingleEdge(src, dest);
             }
         }
     }
@@ -312,8 +333,10 @@ void CausalDiscovery::finalOrientation(std::shared_ptr<Graph> graph)
 void CausalDiscovery::runFCI(std::shared_ptr<Graph> graph, double alpha)
 {
 
-    // Step 1
+    // Step 1: create fully connected graph and remove forbidden edges
     createFullyConnectedGraph(graph);
+    //graph->printGraph();
+    applyForbiddenEdges(graph);
     //graph->printGraph();
 
     // Step 2

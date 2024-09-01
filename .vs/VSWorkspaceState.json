@@ -12,8 +12,12 @@
     "\\doc",
     "\\OpenCL-Headers",
     "\\src",
+    "\\src\\causalDiscovery",
+    "\\src\\ontology",
+    "\\src\\ontologyConstraints",
+    "\\src\\ontology\\tests",
     "\\tests"
   ],
-  "SelectedNode": "\\tests\\CMakeLists.txt",
+  "SelectedNode": "\\src\\ontologyConstraints\\ontologyConstraintsHandler.cpp",
   "PreviewInSolutionExplorer": false
 }
