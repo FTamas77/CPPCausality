@@ -350,6 +350,8 @@ void CausalDiscovery::runFCI(std::shared_ptr<Graph> graph, double alpha)
     // Step 4
     orientVStructures(graph, alpha);
     //graph->printGraph();
+    //applyForbiddenEdges(graph);
+    //graph->printGraph()
 
     // Step 5
     std::set<std::pair<int, int>> possibleDSep = identifyPossibleDSep(graph);

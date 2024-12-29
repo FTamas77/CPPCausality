@@ -18,6 +18,6 @@
     "\\src\\ontology\\tests",
     "\\tests"
   ],
-  "SelectedNode": "\\src\\ontologyConstraints\\ontologyConstraintsHandler.cpp",
+  "SelectedNode": "\\src\\causalDiscovery\\causalDiscovery.cpp",
   "PreviewInSolutionExplorer": false
 }
