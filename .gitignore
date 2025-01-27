@@ -45,3 +45,5 @@
 .vs/CMakeWorkspaceSettings.json
 .vs/slnx.sqlite
 .vs/CMake Overview
+/examples/.vs
+/examples/out/build/x64-Debug
