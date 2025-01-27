@@ -9,7 +9,7 @@
 CausalDiscoveryAPI::CausalDiscoveryAPI()
     : causalDiscovery_(std::make_shared<CausalDiscovery>()),
     alpha_(0.05),
-    graph_(nullptr
+    graph_(nullptr)
 {
 }
 
