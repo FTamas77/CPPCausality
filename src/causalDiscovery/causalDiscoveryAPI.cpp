@@ -1,5 +1,6 @@
 #include "CausalDiscoveryAPI.h"
 #include "CausalDiscovery.h"
+#include "CSVReader.h"
 #include "Dataset.h"
 #include "Graph.h"
 
@@ -23,19 +24,11 @@ void CausalDiscoveryAPI::setAlpha(double alpha) {
     alpha_ = alpha;
 }
 
-void CausalDiscoveryAPI::loadDataset(const Dataset& dataset) {
-    auto datasetPtr = std::make_shared<Dataset>(dataset);
-    graph_ = std::make_shared<Graph>(datasetPtr);
-}
-
-
 void CausalDiscoveryAPI::loadDatasetFromFile(const std::string& filename) {
-    Dataset dataset;
 
-    // TODO: Implement loading from file
-    //dataset.loadFromFile(filename);
-
-    loadDataset(dataset);
+    auto columns = CSVReader::readCSVFile(filename, 4);
+    auto data = std::make_shared<Dataset>(std::move(columns));
+    graph_ = std::make_shared<Graph>(data);
 }
 
 
@@ -55,11 +48,10 @@ std::shared_ptr<Graph> CausalDiscoveryAPI::getResultingGraph() const {
     return graph_;
 }
 
-void CausalDiscoveryAPI::saveResult(const std::string& filename) const {
+void CausalDiscoveryAPI::printGraph() const {
     if (!graph_) {
         throw std::runtime_error("No graph has been generated yet.");
     }
 
-    // TODO: Implement saving to file
-    //graph_->saveToFile(filename);
+    graph_->printGraph();
 }

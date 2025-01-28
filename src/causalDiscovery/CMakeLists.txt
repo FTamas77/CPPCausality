@@ -7,16 +7,19 @@
 
 find_package(Eigen3 REQUIRED)
 
-# TODO: use variable
 set(INCLUDE_DIR ../include)
+
 add_library(causalDiscovery_interface INTERFACE)
 target_include_directories(causalDiscovery_interface INTERFACE ${INCLUDE_DIR})
 
-target_include_directories(causalDiscovery PUBLIC ${Boost_INCLUDE_DIRS} .)
-target_link_libraries(causalDiscovery PUBLIC causalDiscovery_interface Boost::serialization Boost::math Eigen3::Eigen)
+# TODO: move into utils
+add_library(csvreader STATIC CSVReader.cpp)
+target_link_libraries(csvreader causalDiscovery)
+install(TARGETS csvreader DESTINATION .)
 
-# Because I want to use the library in the tests
-#target_include_directories(causalDiscovery PUBLIC .)
+target_link_libraries(causalDiscovery PUBLIC csvreader causalDiscovery_interface Boost::serialization Boost::math Eigen3::Eigen)
+
+target_include_directories(causalDiscovery PUBLIC ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS causalDiscovery DESTINATION .)
 

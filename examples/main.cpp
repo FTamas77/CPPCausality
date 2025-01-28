@@ -7,11 +7,11 @@ int main() {
 
         api.setAlpha(0.05);
 
-        api.loadDatasetFromFile("data.csv");
+        api.loadDatasetFromFile(std::string(PROJECT_SOURCE_DIR) + "/KV-41762_202301_test.csv");
 
         api.run();
 
-        api.saveResult("output_graph.txt");
+        api.printGraph();
 
         std::cout << "Causal discovery completed successfully!" << std::endl;
     }

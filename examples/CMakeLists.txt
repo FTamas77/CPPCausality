@@ -12,4 +12,6 @@ add_executable(main_example main.cpp)
 target_include_directories(main_example PRIVATE ${CMAKE_SOURCE_DIR}/../src/include)
 target_link_directories(main_example PRIVATE ${CMAKE_SOURCE_DIR}/../build/Debug/Debug)
 
-target_link_libraries(main_example PRIVATE causalDiscovery)
+target_link_libraries(main_example PRIVATE causalDiscovery csvreader)
+
+target_compile_definitions(main_example PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")

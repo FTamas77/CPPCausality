@@ -9,16 +9,13 @@ function(add_post_build_copy target)
     )
 endfunction()
 
-add_library(csvreader STATIC CSVReader.cpp)
-target_link_libraries(csvreader causalDiscovery)
-
 find_package(GTest REQUIRED)
 
-add_executable(functionalTest causalDiscoveryTest.cpp dataFromOntologyTest.cpp)
+add_executable(functionalIntegrationTest causalDiscoveryTest.cpp dataFromOntologyTest.cpp)
 
 # TODO: GTest::gtest GTest::gtest_main does not work
 message(STATUS "gtest_LIBRARIES_DEBUG: ${gtest_LIBRARIES_DEBUG}")
-target_link_libraries(functionalTest
+target_link_libraries(functionalIntegrationTest
     causalDiscovery 
     ontology
     csvreader
@@ -26,15 +23,15 @@ target_link_libraries(functionalTest
     "D:/conan_data/b/gtest7a7aa469c4366/b/build/lib/Debug/gtest_main.lib")
 
 message(STATUS "gtest_INCLUDE_DIRS_DEBUG: ${gtest_INCLUDE_DIRS_DEBUG}")
-target_include_directories(functionalTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
+target_include_directories(functionalIntegrationTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
 
-add_test(NAME functionalTest COMMAND functionalTest)
+add_test(NAME functionalIntegrationTest COMMAND functionalIntegrationTest)
 
-add_post_build_copy(functionalTest)
+add_post_build_copy(functionalIntegrationTest)
 
-add_executable(ontologyWithDiscoveryTest ontologyWithDiscoveryTest.cpp)
+add_executable(ontologyWithDiscoveryIntegrationTest ontologyWithDiscoveryTest.cpp)
 
-target_link_libraries(ontologyWithDiscoveryTest
+target_link_libraries(ontologyWithDiscoveryIntegrationTest
     causalDiscovery 
     ontology
     ontologyConstraintsHandler
@@ -42,8 +39,8 @@ target_link_libraries(ontologyWithDiscoveryTest
     "D:/conan_data/b/gtest7a7aa469c4366/b/build/lib/Debug/gtest.lib"
     "D:/conan_data/b/gtest7a7aa469c4366/b/build/lib/Debug/gtest_main.lib")
 
-target_include_directories(ontologyWithDiscoveryTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
+target_include_directories(ontologyWithDiscoveryIntegrationTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
 
-add_test(NAME ontologyWithDiscoveryTest COMMAND ontologyWithDiscoveryTest)
+add_test(NAME ontologyWithDiscoveryIntegrationTest COMMAND ontologyWithDiscoveryIntegrationTest)
 
-add_post_build_copy(ontologyWithDiscoveryTest)
+add_post_build_copy(ontologyWithDiscoveryIntegrationTest)
