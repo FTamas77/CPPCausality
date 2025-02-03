@@ -1,6 +1,6 @@
 ﻿find_package(GTest REQUIRED)
 
-add_executable(ontologyUnitTest ontologyTest.cpp)
+add_executable(ontologyUnitTest ontologyTest.cpp ontologyXMLReaderTest.cpp)
 
 target_link_libraries(ontologyUnitTest 
 	ontology

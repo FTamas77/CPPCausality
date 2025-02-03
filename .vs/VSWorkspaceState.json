@@ -9,15 +9,16 @@
   },
   "ExpandedNodes": [
     "",
-    "\\doc",
-    "\\OpenCL-Headers",
+    "\\examples",
     "\\src",
     "\\src\\causalDiscovery",
+    "\\src\\causalDiscovery\\tests",
     "\\src\\ontology",
     "\\src\\ontologyConstraints",
     "\\src\\ontology\\tests",
-    "\\tests"
+    "\\tests",
+    "\\tools"
   ],
-  "SelectedNode": "\\src\\causalDiscovery\\causalDiscovery.cpp",
+  "SelectedNode": "\\src\\causalDiscovery\\CSVReader.cpp",
   "PreviewInSolutionExplorer": false
 }
