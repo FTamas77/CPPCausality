@@ -8,7 +8,7 @@
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "/m:16",
       "ctestCommandArgs": "",
       "intelliSenseMode": "windows-msvc-x64"
     },

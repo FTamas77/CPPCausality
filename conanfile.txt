@@ -10,6 +10,8 @@ CMakeToolchain
 
 [options]
 boost/*:without_log=False
+boost/*:without_log_setup=False
+boost/*:extra_system_libs=boost_log_setup
 gtest/*:shared=False
 
 [layout]

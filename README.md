@@ -87,6 +87,30 @@ target_compile_definitions(main_example PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOUR
 
 The example will load your dataset, perform causal discovery using the enhanced FCI algorithm, and output the resulting causal graph structure.
 
+## Known Issues
+
+### Conan Package Path Issues
+
+There is currently a temporary fix in our CMakeLists.txt for some Conan packages, particularly Google Test:
+
+```cmake
+# Temporary fix for some conan packages
+set(GTEST_INC_DIR "c:/conan_data/b/gtest9909e8a124da0/p/include/")
+set(GTEST_LIB_DIR "c:/conan_data/b/gtest9909e8a124da0/p/lib/")
+set(GTEST_LIB "${GTEST_LIB_DIR}/gtest.lib")
+set(GTEST_MAIN_LIB "${GTEST_LIB_DIR}/gtest_main.lib")
+```
+
+This hardcoded path is necessary because the Conan-provided path resolution isn't working correctly. If you encounter build errors related to missing GTest libraries or includes, you may need to adjust these paths to match your Conan cache location.
+
+## Building the Project
+
+[Add build instructions here]
+
+## Usage
+
+[Add usage instructions here]
+
 ## Applications
 
 The Ontology-Enhanced FCI algorithm has diverse real-world applications:

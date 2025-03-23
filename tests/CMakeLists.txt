@@ -19,8 +19,8 @@ target_link_libraries(functionalIntegrationTest
     causalDiscovery 
     ontology
     csvreader
-    "D:/conan_data/b/gtest7a7aa469c4366/b/build/lib/Debug/gtest.lib"
-    "D:/conan_data/b/gtest7a7aa469c4366/b/build/lib/Debug/gtest_main.lib")
+    GTest::gtest
+    GTest::gtest_main)
 
 message(STATUS "gtest_INCLUDE_DIRS_DEBUG: ${gtest_INCLUDE_DIRS_DEBUG}")
 target_include_directories(functionalIntegrationTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
@@ -36,8 +36,8 @@ target_link_libraries(ontologyWithDiscoveryIntegrationTest
     ontology
     ontologyConstraintsHandler
     csvreader
-    "D:/conan_data/b/gtest7a7aa469c4366/b/build/lib/Debug/gtest.lib"
-    "D:/conan_data/b/gtest7a7aa469c4366/b/build/lib/Debug/gtest_main.lib")
+    ${GTEST_LIB}
+    ${GTEST_MAIN_LIB})
 
 target_include_directories(ontologyWithDiscoveryIntegrationTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
 
