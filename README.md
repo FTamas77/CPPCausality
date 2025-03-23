@@ -87,6 +87,14 @@ target_compile_definitions(main_example PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOUR
 
 The example will load your dataset, perform causal discovery using the enhanced FCI algorithm, and output the resulting causal graph structure.
 
+## Available Datasets
+
+The complete collection of test datasets used in this project can be found in our repository:
+
+https://github.com/FTamas77/Causality/tree/develop/datasets/vehicles
+
+These datasets contain various vehicle-related metrics formatted for immediate use with the API demonstrated in the examples above.
+
 ## Known Issues
 
 ### Conan Package Path Issues
