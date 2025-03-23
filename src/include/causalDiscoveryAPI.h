@@ -16,7 +16,7 @@ public:
 
     void setAlpha(double alpha);
 
-    void loadDatasetFromFile(const std::string& filename);
+    void loadDatasetFromFile(const std::string& filename, int numColumns = 4);
 
     void run();
 

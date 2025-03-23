@@ -24,13 +24,11 @@ void CausalDiscoveryAPI::setAlpha(double alpha) {
     alpha_ = alpha;
 }
 
-void CausalDiscoveryAPI::loadDatasetFromFile(const std::string& filename) {
-
-    auto columns = CSVReader::readCSVFile(filename, 4);
+void CausalDiscoveryAPI::loadDatasetFromFile(const std::string& filename, int numColumns) {
+    auto columns = CSVReader::readCSVFile(filename, numColumns);
     auto data = std::make_shared<Dataset>(std::move(columns));
     graph_ = std::make_shared<Graph>(data);
 }
-
 
 void CausalDiscoveryAPI::run() {
     if (!graph_) {

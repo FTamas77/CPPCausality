@@ -7,7 +7,7 @@ int main() {
 
         api.setAlpha(0.05);
 
-        api.loadDatasetFromFile(std::string(PROJECT_SOURCE_DIR) + "/KV-41762_202301_test.csv");
+        api.loadDatasetFromFile(std::string(PROJECT_SOURCE_DIR) + "/KV-41762_202301_test.csv", 4);
 
         api.run();
 
