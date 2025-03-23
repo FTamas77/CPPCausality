@@ -103,14 +103,6 @@ set(GTEST_MAIN_LIB "${GTEST_LIB_DIR}/gtest_main.lib")
 
 This hardcoded path is necessary because the Conan-provided path resolution isn't working correctly. If you encounter build errors related to missing GTest libraries or includes, you may need to adjust these paths to match your Conan cache location.
 
-## Building the Project
-
-[Add build instructions here]
-
-## Usage
-
-[Add usage instructions here]
-
 ## Applications
 
 The Ontology-Enhanced FCI algorithm has diverse real-world applications:
