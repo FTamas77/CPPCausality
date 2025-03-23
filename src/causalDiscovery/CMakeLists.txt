@@ -1,7 +1,6 @@
 ﻿add_library(causalDiscovery 
     causalDiscovery.cpp
     causalDiscoveryAPI.cpp
-    dataLoader.cpp
     graph.cpp
     statistic.cpp)
 
