@@ -1,9 +1,9 @@
 add_library(ontologyConstraintsHandler ontologyConstraintsHandler.cpp)
 
-# Because I want to use the library in the tests
-target_include_directories(ontologyConstraintsHandler PUBLIC .)
+target_include_directories(ontologyConstraintsHandler PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(ontologyConstraintsHandler
+    PUBLIC
     causalDiscovery 
     ontology)
 

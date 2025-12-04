@@ -4,43 +4,36 @@ function(add_post_build_copy target)
         COMMAND ${CMAKE_COMMAND} -E echo "Starting to copy KV-41762_202301_test.csv for ${target}"
         COMMAND ${CMAKE_COMMAND} -E copy
             "${CMAKE_SOURCE_DIR}/tests/KV-41762_202301_test.csv"
-            "${CMAKE_BINARY_DIR}/$(Configuration)/KV-41762_202301_test.csv"
+            "$<TARGET_FILE_DIR:${target}>/KV-41762_202301_test.csv"
         COMMENT "Copying KV-41762_202301_test.csv to the binary directory for ${target}"
     )
 endfunction()
 
-find_package(GTest REQUIRED)
-
 add_executable(functionalIntegrationTest causalDiscoveryTest.cpp dataFromOntologyTest.cpp)
 
-# TODO: GTest::gtest GTest::gtest_main does not work
-message(STATUS "gtest_LIBRARIES_DEBUG: ${gtest_LIBRARIES_DEBUG}")
 target_link_libraries(functionalIntegrationTest
+    PRIVATE
     causalDiscovery 
     ontology
     csvreader
     GTest::gtest
     GTest::gtest_main)
 
-message(STATUS "gtest_INCLUDE_DIRS_DEBUG: ${gtest_INCLUDE_DIRS_DEBUG}")
-target_include_directories(functionalIntegrationTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
-
 add_test(NAME functionalIntegrationTest COMMAND functionalIntegrationTest)
-
+set_tests_properties(functionalIntegrationTest PROPERTIES WORKING_DIRECTORY "$<TARGET_FILE_DIR:functionalIntegrationTest>")
 add_post_build_copy(functionalIntegrationTest)
 
 add_executable(ontologyWithDiscoveryIntegrationTest ontologyWithDiscoveryTest.cpp)
 
 target_link_libraries(ontologyWithDiscoveryIntegrationTest
+    PRIVATE
     causalDiscovery 
     ontology
     ontologyConstraintsHandler
     csvreader
-    ${GTEST_LIB}
-    ${GTEST_MAIN_LIB})
-
-target_include_directories(ontologyWithDiscoveryIntegrationTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
+    GTest::gtest
+    GTest::gtest_main)
 
 add_test(NAME ontologyWithDiscoveryIntegrationTest COMMAND ontologyWithDiscoveryIntegrationTest)
-
+set_tests_properties(ontologyWithDiscoveryIntegrationTest PROPERTIES WORKING_DIRECTORY "$<TARGET_FILE_DIR:ontologyWithDiscoveryIntegrationTest>")
 add_post_build_copy(ontologyWithDiscoveryIntegrationTest)

@@ -1,6 +1,6 @@
 [requires]
-boost/1.85.0
-gtest/1.14.0
+boost/1.86.0
+gtest/1.15.0
 eigen/3.4.0
 pugixml/1.14
 
@@ -11,11 +11,8 @@ CMakeToolchain
 [options]
 boost/*:without_log=False
 boost/*:without_log_setup=False
-boost/*:extra_system_libs=boost_log_setup
-gtest/*:shared=False
 
 [layout]
 cmake_layout
 
 [tool_requires]
-b2/5.2.0

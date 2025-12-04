@@ -3,11 +3,10 @@
 add_executable(statisticUnitTest statisticTest.cpp)
 
 target_link_libraries(statisticUnitTest
-	causalDiscovery 
-    ${GTEST_LIB}
-    ${GTEST_MAIN_LIB})
-
-target_include_directories(statisticUnitTest PRIVATE "${gtest_INCLUDE_DIRS_DEBUG}")
+    PRIVATE
+    causalDiscovery 
+    GTest::gtest
+    GTest::gtest_main)
 
 add_test(NAME statisticUnitTest COMMAND statisticUnitTest)
 
