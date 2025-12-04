@@ -31,19 +31,21 @@
 *.out
 *.app
 
-.out
+# Build directories
+/build
+/out
+/install
+
+# Conan
 /conaninfo.txt
 /conanbuildinfo.cmake
 /conan.lock
-/out
 /conanbuildinfo.txt
 /graph_info.json
-/build
-/install
-.vs/CPPCausality
-.vs/cmake.db
-.vs/CMakeWorkspaceSettings.json
-.vs/slnx.sqlite
-.vs/CMake Overview
+
+# Visual Studio
+.vs/
+
+# Examples
 /examples/.vs
-/examples/out/build/x64-Debug
+/examples/out
