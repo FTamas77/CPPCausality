@@ -29,12 +29,15 @@ find_package(GTest REQUIRED)
 
 # Enable testing before adding subdirectories that contain tests
 option(RUN_TESTS "Build the tests" ON)
-if(RUN_TESTS)
-    enable_testing()
-endif()
+option(BUILD_EXAMPLES "Build example executables" ON)
 
 add_subdirectory(src)
 
 if(RUN_TESTS)
+    enable_testing()
     add_subdirectory(tests)
+endif()
+
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()
