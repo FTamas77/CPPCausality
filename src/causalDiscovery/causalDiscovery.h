@@ -11,6 +11,7 @@ class CausalDiscovery
     // Step 1: create fully connected graph and remove forbidden edges
     void createFullyConnectedGraph(std::shared_ptr<Graph> graph);
     void applyForbiddenEdges(std::shared_ptr<Graph> graph);
+    void enforceRequiredEdges(std::shared_ptr<Graph> graph);
 
     // Step 2
     void addToConditioningSet(std::set<int> &conditioningSet, int numVertices, int i, int j);
@@ -36,6 +37,7 @@ class CausalDiscovery
 
     // Step 6
     void finalOrientation(std::shared_ptr<Graph> graph);
+    void applyDirectionConstraints(std::shared_ptr<Graph> graph);
 
 public:
     void runFCI(std::shared_ptr<Graph> data, double alpha);

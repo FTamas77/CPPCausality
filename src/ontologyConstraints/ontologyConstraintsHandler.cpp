@@ -4,22 +4,51 @@
 #include "graph.h"
 #include <memory>
 
-OntologyConstraintsHandler::OntologyConstraintsHandler(const std::string& cannotCausePropertyName)
-    : cannotCausePropertyName(cannotCausePropertyName) {}
+OntologyConstraintsHandler::OntologyConstraintsHandler(
+    const std::string& cannotCausePropertyName,
+    const std::string& mustCausePropertyName,
+    const std::string& directionPropertyName)
+    : cannotCausePropertyName(cannotCausePropertyName)
+    , mustCausePropertyName(mustCausePropertyName)
+    , directionPropertyName(directionPropertyName) {}
 
 void OntologyConstraintsHandler::applyConstraints(const std::shared_ptr<Ontology>& ontology, std::shared_ptr<Graph> graph) {
-    auto properties = ontology->getProperties(cannotCausePropertyName);
-
-    for (const auto& property : properties) {
-        auto objectProperty = std::dynamic_pointer_cast<ObjectProperty>(property);
-        if (objectProperty) {
-            int from = std::stoi(objectProperty->getDomain()->getName());
-            int to = std::stoi(objectProperty->getRange()->getName());
-            graph->addForbiddenEdge(from, to);
+    // Apply forbidden edges (cannotCause)
+    if (!cannotCausePropertyName.empty()) {
+        auto properties = ontology->getProperties(cannotCausePropertyName);
+        for (const auto& property : properties) {
+            auto objectProperty = std::dynamic_pointer_cast<ObjectProperty>(property);
+            if (objectProperty) {
+                int from = std::stoi(objectProperty->getDomain()->getName());
+                int to = std::stoi(objectProperty->getRange()->getName());
+                graph->addForbiddenEdge(from, to);
+            }
         }
-        else {
-            // Handle the case where the property is not an ObjectProperty
-            // You might want to log an error or handle other types of properties
+    }
+
+    // Apply required edges (mustCause)
+    if (!mustCausePropertyName.empty()) {
+        auto properties = ontology->getProperties(mustCausePropertyName);
+        for (const auto& property : properties) {
+            auto objectProperty = std::dynamic_pointer_cast<ObjectProperty>(property);
+            if (objectProperty) {
+                int from = std::stoi(objectProperty->getDomain()->getName());
+                int to = std::stoi(objectProperty->getRange()->getName());
+                graph->addRequiredEdge(from, to);
+            }
+        }
+    }
+
+    // Apply direction constraints (directionOnly)
+    if (!directionPropertyName.empty()) {
+        auto properties = ontology->getProperties(directionPropertyName);
+        for (const auto& property : properties) {
+            auto objectProperty = std::dynamic_pointer_cast<ObjectProperty>(property);
+            if (objectProperty) {
+                int from = std::stoi(objectProperty->getDomain()->getName());
+                int to = std::stoi(objectProperty->getRange()->getName());
+                graph->addDirectionConstraint(from, to);
+            }
         }
     }
 }

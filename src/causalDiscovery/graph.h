@@ -23,7 +23,6 @@ public:
     void addDirectedEdge(int src, int dest);
     void addDoubleDirectedEdge(int src, int dest);
 
-    //bool hasEdge(int src, int dest) const;
     bool hasDirectedEdge(int src, int dest) const;
     bool hasDoubleDirectedEdge(int src, int dest) const;
 
@@ -32,8 +31,6 @@ public:
     size_t getNumVertices() const;
 
     std::vector<int> getNeighbors(int vertex) const;
-
-    //void orientEdge(int src, int dest);
 
     void printGraph() const;
 
@@ -45,30 +42,28 @@ public:
 
     friend bool operator==(const std::shared_ptr<Graph>& lhs, const std::shared_ptr<Graph>& rhs);
 
-    // TODO: move to the cpp
-    void addForbiddenEdge(int from, int to) {
-        forbiddenEdges.emplace_back(from, to);
-    }
+    // Forbidden edges
+    void addForbiddenEdge(int from, int to);
+    bool isForbiddenEdge(int from, int to) const;
+    const std::vector<std::pair<int, int>>& getForbiddenEdges() const;
 
-    bool isForbiddenEdge(int from, int to) const {
-        for (const auto& edge : forbiddenEdges) {
-            if (edge.first == from && edge.second == to) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // Required edges
+    void addRequiredEdge(int from, int to);
+    bool isRequiredEdge(int from, int to) const;
+    const std::vector<std::pair<int, int>>& getRequiredEdges() const;
 
-    const std::vector<std::pair<int, int>>& getForbiddenEdges() const {
-        return forbiddenEdges;
-    }
+    // Direction constraints (if edge exists, enforce direction)
+    void addDirectionConstraint(int from, int to);
+    bool hasDirectionConstraint(int from, int to) const;
+    const std::vector<std::pair<int, int>>& getDirectionConstraints() const;
 
 private:
     std::vector<NeighborSet> m_adjList;
-
     std::shared_ptr<Dataset> m_dataset;
 
     std::vector<std::pair<int, int>> forbiddenEdges;
+    std::vector<std::pair<int, int>> requiredEdges;
+    std::vector<std::pair<int, int>> directionConstraints;
 };
 
 #endif // GRAPH_H

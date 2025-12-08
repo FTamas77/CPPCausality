@@ -204,3 +204,57 @@ bool operator==(const std::shared_ptr<Graph>& lhs, const std::shared_ptr<Graph>&
     }
     return *lhs == *rhs;
 }
+
+// Forbidden edges
+void Graph::addForbiddenEdge(int from, int to) {
+    forbiddenEdges.emplace_back(from, to);
+}
+
+bool Graph::isForbiddenEdge(int from, int to) const {
+    for (const auto& edge : forbiddenEdges) {
+        if (edge.first == from && edge.second == to) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const std::vector<std::pair<int, int>>& Graph::getForbiddenEdges() const {
+    return forbiddenEdges;
+}
+
+// Required edges
+void Graph::addRequiredEdge(int from, int to) {
+    requiredEdges.emplace_back(from, to);
+}
+
+bool Graph::isRequiredEdge(int from, int to) const {
+    for (const auto& edge : requiredEdges) {
+        if (edge.first == from && edge.second == to) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const std::vector<std::pair<int, int>>& Graph::getRequiredEdges() const {
+    return requiredEdges;
+}
+
+// Direction constraints
+void Graph::addDirectionConstraint(int from, int to) {
+    directionConstraints.emplace_back(from, to);
+}
+
+bool Graph::hasDirectionConstraint(int from, int to) const {
+    for (const auto& constraint : directionConstraints) {
+        if (constraint.first == from && constraint.second == to) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const std::vector<std::pair<int, int>>& Graph::getDirectionConstraints() const {
+    return directionConstraints;
+}

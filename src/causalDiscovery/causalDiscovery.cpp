@@ -35,6 +35,23 @@ void CausalDiscovery::applyForbiddenEdges(std::shared_ptr<Graph> graph) {
         if (graph->hasDirectedEdge(from, to)) {
             graph->removeSingleEdge(from, to);
         }
+        if (graph->hasDirectedEdge(to, from)) {
+            graph->removeSingleEdge(to, from);
+        }
+    }
+}
+
+void CausalDiscovery::enforceRequiredEdges(std::shared_ptr<Graph> graph) {
+    const auto& requiredEdges = graph->getRequiredEdges();
+
+    for (const auto& edge : requiredEdges) {
+        int from = edge.first;
+        int to = edge.second;
+
+        // Ensure the required edge exists (add if missing)
+        if (!graph->hasDirectedEdge(from, to) && !graph->hasDoubleDirectedEdge(from, to)) {
+            graph->addDirectedEdge(from, to);
+        }
     }
 }
 
@@ -301,8 +318,30 @@ void CausalDiscovery::applyFCIRules(std::shared_ptr<Graph> graph, double alpha, 
     }
 }
 
+void CausalDiscovery::applyDirectionConstraints(std::shared_ptr<Graph> graph) {
+    const auto& constraints = graph->getDirectionConstraints();
+
+    for (const auto& constraint : constraints) {
+        int from = constraint.first;
+        int to = constraint.second;
+
+        // If an undirected edge exists, orient it according to constraint
+        if (graph->hasDoubleDirectedEdge(from, to)) {
+            graph->removeSingleEdge(to, from);
+        }
+        // If directed edge exists in wrong direction, flip it
+        else if (graph->hasDirectedEdge(to, from)) {
+            graph->removeSingleEdge(to, from);
+            graph->addDirectedEdge(from, to);
+        }
+    }
+}
+
 void CausalDiscovery::finalOrientation(std::shared_ptr<Graph> graph)
 {
+    // First apply direction constraints
+    applyDirectionConstraints(graph);
+
     // Iterate over each edge in the graph
     for (const auto &edge : graph->getEdges())
     {
@@ -310,21 +349,26 @@ void CausalDiscovery::finalOrientation(std::shared_ptr<Graph> graph)
         int dest = std::get<1>(edge);
         bool isOriented = std::get<2>(edge);
 
-        // TODO: apply domain-specific rules
-
         // Orient the edge if it is not already oriented
         if (!isOriented)
         {
-            // Orient the edge from the lower-indexed vertex to the higher-indexed vertex
-            if (src < dest)
-            {
-                //graph->orientEdge(src, dest);
+            // Check if there's a direction constraint
+            if (graph->hasDirectionConstraint(src, dest)) {
                 graph->removeSingleEdge(dest, src);
             }
-            else
-            {
-                //graph->orientEdge(dest, src);
+            else if (graph->hasDirectionConstraint(dest, src)) {
                 graph->removeSingleEdge(src, dest);
+            }
+            else {
+                // Default: Orient from lower to higher index
+                if (src < dest)
+                {
+                    graph->removeSingleEdge(dest, src);
+                }
+                else
+                {
+                    graph->removeSingleEdge(src, dest);
+                }
             }
         }
     }
@@ -332,33 +376,27 @@ void CausalDiscovery::finalOrientation(std::shared_ptr<Graph> graph)
 
 void CausalDiscovery::runFCI(std::shared_ptr<Graph> graph, double alpha)
 {
-
-    // Step 1: create fully connected graph and remove forbidden edges
+    // Step 1: create fully connected graph, remove forbidden edges, add required edges
     createFullyConnectedGraph(graph);
-    //graph->printGraph();
     applyForbiddenEdges(graph);
-    //graph->printGraph();
+    enforceRequiredEdges(graph);
 
     // Step 2
     applyPCAlgorithm(graph, alpha);
-    //graph->printGraph();
 
     // Step 3
     pruneGraph(graph, alpha);
-    //graph->printGraph();
+
+    // Re-enforce required edges after pruning
+    enforceRequiredEdges(graph);
 
     // Step 4
     orientVStructures(graph, alpha);
-    //graph->printGraph();
-    //applyForbiddenEdges(graph);
-    //graph->printGraph()
 
     // Step 5
     std::set<std::pair<int, int>> possibleDSep = identifyPossibleDSep(graph);
     applyFCIRules(graph, alpha, possibleDSep);
-    //graph->printGraph();
 
     // Step 6
     finalOrientation(graph);
-    //graph->printGraph();
 }

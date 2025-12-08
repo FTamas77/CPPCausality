@@ -10,12 +10,18 @@ class Property;
 
 class OntologyConstraintsHandler {
 public:
-    explicit OntologyConstraintsHandler(const std::string& cannotCausePropertyName);
+    explicit OntologyConstraintsHandler(
+        const std::string& cannotCausePropertyName,
+        const std::string& mustCausePropertyName = "",
+        const std::string& directionPropertyName = ""
+    );
 
     void applyConstraints(const std::shared_ptr<Ontology>& ontology, std::shared_ptr<Graph> graph);
 
 private:
     std::string cannotCausePropertyName;
+    std::string mustCausePropertyName;
+    std::string directionPropertyName;
 };
 
 #endif
