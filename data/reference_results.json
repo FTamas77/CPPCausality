@@ -1,0 +1,76 @@
+{
+  "description": "Ground truth causal graph from Fekete & Wicaksono (2025)",
+  "dataset": "463,568 Hungarian vehicle records (Jan-Mar 2023)",
+  "variables": {
+    "hengerurtartalom": "Cylinder Capacity (cm³)",
+    "teljesitmeny": "Engine Power (kW)",
+    "CO2_kibocsatas": "CO2 Emissions (g/km)",
+    "elhaladasi_zaj": "Passing Noise (dB)"
+  },
+  "ground_truth_edges": [
+    {
+      "from": "hengerurtartalom",
+      "to": "teljesitmeny",
+      "type": "directed",
+      "confidence": "high",
+      "justification": "Domain knowledge: larger displacement increases power output"
+    },
+    {
+      "from": "hengerurtartalom",
+      "to": "CO2_kibocsatas",
+      "type": "directed",
+      "confidence": "high",
+      "justification": "Causal: larger engines emit more CO2"
+    },
+    {
+      "from": "teljesitmeny",
+      "to": "CO2_kibocsatas",
+      "type": "directed",
+      "confidence": "high",
+      "justification": "Causal: higher power correlates with higher emissions"
+    }
+  ],
+  "forbidden_edges": [
+    {
+      "from": "elhaladasi_zaj",
+      "to": "CO2_kibocsatas",
+      "reason": "Physically implausible: noise does not cause emissions",
+      "ontology_constraint": "cannotCause"
+    },
+    {
+      "from": "CO2_kibocsatas",
+      "to": "hengerurtartalom",
+      "reason": "Wrong direction: emissions cannot cause engine size"
+    }
+  ],
+  "expected_metrics": {
+    "pc_without_ontology": {
+      "f1_score": 0.67,
+      "precision": 0.65,
+      "recall": 0.69,
+      "spurious_edges": 2,
+      "notes": "May incorrectly include noise->CO2 edge"
+    },
+    "fci_with_ontology": {
+      "f1_score": 0.78,
+      "precision": 0.82,
+      "recall": 0.75,
+      "spurious_edges": 0,
+      "notes": "Ontology constraints prevent forbidden edges"
+    },
+    "ges": {
+      "f1_score": 0.71,
+      "precision": 0.73,
+      "recall": 0.69,
+      "spurious_edges": 1,
+      "notes": "Score-based, may vary with data"
+    }
+  },
+  "publication_reference": {
+    "title": "Ontology-guided causal discovery and inference for reducing CO2 emissions in transportation",
+    "authors": "Fekete, T., & Wicaksono, H.",
+    "journal": "International Journal of Sustainable Transportation",
+    "year": 2025,
+    "doi": "10.1080/15568318.2025.2588608"
+  }
+}

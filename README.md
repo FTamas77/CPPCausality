@@ -1,12 +1,26 @@
-# Ontology-Enhanced Fast Causal Inference (FCI)
+# CPPCausality
 
-> **Part of Publication:** Fekete, T., & Wicaksono, H. (2025). Ontology-guided causal discovery and inference for reducing CO2 emissions in transportation. *International Journal of Sustainable Transportation*. [DOI: 10.1080/15568318.2025.2588608](https://doi.org/10.1080/15568318.2025.2588608)
+**High-Performance Ontology-Guided Causal Discovery for Vehicle Emissions**
 
-> **Related Repositories:**
-> - 📊 [Python Implementation + Dataset](https://github.com/FTamas77/Causality) - GUI, DoWhy inference, 463K vehicle dataset
-> - 📄 [Dataset Documentation](https://github.com/FTamas77/Causality/blob/develop/datasets/vehicles/README.md) ⭐ *Link in paper*
+[![DOI](https://img.shields.io/badge/DOI-10.1080%2F15568318.2025.2588608-blue)](https://doi.org/10.1080/15568318.2025.2588608)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![C++](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
 
-This repository provides the **high-performance C++ implementation** with native ontology constraint handling, as described in our publication.
+> **📄 Publication:** Fekete, T., & Wicaksono, H. (2025). Ontology-guided causal discovery and inference for reducing CO2 emissions in transportation. *International Journal of Sustainable Transportation*. [DOI: 10.1080/15568318.2025.2588608](https://doi.org/10.1080/15568318.2025.2588608)
+
+> **🐍 Python Version:** For GUI and DoWhy inference, see [Causality Repository](https://github.com/FTamas77/Causality)
+
+This is the **C++ implementation** of ontology-guided FCI (Fast Causal Inference) used in our publication. It provides **10-50× faster** execution than Python with native ontology constraint handling.
+
+## Why C++ Version?
+
+| Feature | Python (causal-learn) | C++ (This Repo) |
+|---------|----------------------|-----------------|
+| Speed | Baseline | **10-50× faster** |
+| Ontology Constraints | Post-processing | **Native integration** |
+| Memory | High | **Optimized** |
+| Large Datasets | Slow (>100K records) | **Fast (463K records)** |
+| Use Case | Prototyping, GUI | **Production, Batch** |
 
 ## Key Features
 
@@ -14,7 +28,7 @@ This repository provides the **high-performance C++ implementation** with native
 - **Enhanced Edge Orientation**: Incorporates expert knowledge to resolve ambiguous causal directions.
 - **Robustness to Latent Confounders**: Maintains FCI's ability to account for hidden variables while enhancing reliability.
 - **Scalability**: Optimized for large datasets where traditional methods may falter.
-- **Performance**: 10-100× speedup over Python implementations (causal-learn) for large datasets.
+- **Performance**: 10-50× speedup over Python implementations (causal-learn) for large datasets.
 
 ## Installation
 
@@ -36,9 +50,17 @@ cmake --preset default
 cmake --build --preset debug
 ```
 
+### Run Tests
+
+```sh
+ctest --preset debug
+```
+
 ## Ontology Constraints (Paper Methodology)
 
-As described in Section 4.3 of our publication, three types of ontology constraints can be integrated:
+As described in Section 4.3 of our publication, three types of ontology constraints can be integrated.
+
+See `ontology/vehicle_constraints.owl` for the example ontology file used in our research.
 
 ### 1. Forbidden Adjacencies
 Block physically implausible edges (e.g., noise cannot cause emissions).
@@ -54,7 +76,7 @@ Block physically implausible edges (e.g., noise cannot cause emissions).
 **C++ Usage:**
 ```cpp
 auto ontology = std::make_shared<Ontology>();
-OntologyXMLReader::loadFromRDF(*ontology, "constraints.owl");
+OntologyXMLReader::loadFromRDF(*ontology, "ontology/vehicle_constraints.owl");
 
 OntologyConstraintsHandler handler("cannotCause");
 handler.applyConstraints(ontology, graph);
@@ -124,7 +146,7 @@ int main() {
         
         // Load ontology constraints (as in paper)
         auto ontology = std::make_shared<Ontology>();
-        OntologyXMLReader::loadFromRDF(*ontology, "vehicle_constraints.owl");
+        OntologyXMLReader::loadFromRDF(*ontology, "ontology/vehicle_constraints.owl");
         
         OntologyConstraintsHandler handler("cannotCause");
         handler.applyConstraints(ontology, api.getResultingGraph());
@@ -159,7 +181,7 @@ These datasets are formatted for immediate use with the API demonstrated in the 
 ## Performance Comparison
 
 This C++ implementation provides:
-- **10-100× speedup** over Python (causal-learn) for large datasets
+- **10-50× speedup** over Python (causal-learn) for large datasets
 - Native ontology constraint handling (no Python overhead)
 - Production-ready performance for 400K+ vehicle records
 
@@ -190,5 +212,5 @@ If you use this implementation in your research, please cite:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

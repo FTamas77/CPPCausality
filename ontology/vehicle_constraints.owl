@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://example.org/vehicle#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#">
+    
+    <owl:Ontology rdf:about="http://example.org/vehicle">
+        <rdfs:label>Vehicle Emissions Ontology Constraints</rdfs:label>
+        <rdfs:comment>Ontology constraints for causal discovery in vehicle emissions analysis.
+        Used in: Fekete &amp; Wicaksono (2025) - Ontology-guided causal discovery and inference 
+        for reducing CO2 emissions in transportation.</rdfs:comment>
+    </owl:Ontology>
+    
+    <!-- ==================== Classes ==================== -->
+    
+    <!-- Vehicle Properties -->
+    <owl:Class rdf:about="#CylinderCapacity">
+        <rdfs:label>Cylinder Capacity (hengerurtartalom)</rdfs:label>
+        <rdfs:comment>Engine displacement in cubic centimeters</rdfs:comment>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#EnginePower">
+        <rdfs:label>Engine Power (teljesitmeny)</rdfs:label>
+        <rdfs:comment>Maximum engine power in kilowatts</rdfs:comment>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#PassingNoise">
+        <rdfs:label>Passing Noise (elhaladasi_zaj)</rdfs:label>
+        <rdfs:comment>Drive-by noise level in decibels</rdfs:comment>
+    </owl:Class>
+    
+    <owl:Class rdf:about="#CO2Emissions">
+        <rdfs:label>CO2 Emissions (CO2_kibocsatas)</rdfs:label>
+        <rdfs:comment>CO2 emissions in grams per kilometer</rdfs:comment>
+    </owl:Class>
+    
+    <!-- ==================== Constraint Properties ==================== -->
+    
+    <!-- Forbidden Edge: PassingNoise cannot cause CO2Emissions -->
+    <!-- Physical justification: Noise is a byproduct, not a cause of emissions -->
+    <owl:ObjectProperty rdf:about="#cannotCause">
+        <rdfs:label>Cannot Cause (Forbidden Edge)</rdfs:label>
+        <rdfs:comment>Defines edges that should be blocked in causal discovery</rdfs:comment>
+        <rdfs:domain rdf:resource="#PassingNoise"/>
+        <rdfs:range rdf:resource="#CO2Emissions"/>
+    </owl:ObjectProperty>
+    
+    <!-- Required Edge: CylinderCapacity must cause EnginePower -->
+    <!-- Physical justification: Larger engines produce more power -->
+    <owl:ObjectProperty rdf:about="#mustCause">
+        <rdfs:label>Must Cause (Required Edge)</rdfs:label>
+        <rdfs:comment>Defines edges that must exist in the causal graph</rdfs:comment>
+        <rdfs:domain rdf:resource="#CylinderCapacity"/>
+        <rdfs:range rdf:resource="#EnginePower"/>
+    </owl:ObjectProperty>
+    
+</rdf:RDF>
